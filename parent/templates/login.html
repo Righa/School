@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{%block title%}Home Page{%endblock%}
+{%block content%}
+<div class="row py-5 align-items-center">
+	<div class="col-6 mx-auto">
+		<div class="jumbotron p-5">
+			<div class="card p-3">
+				<div class="card-body text-primary">
+					<h1 class="card-title">{{ type }}</h1>
+				</div>
+				<form class="card" method="post">
+					{{ form.hidden_tag() }}
+					<div class="card-body">
+						<div class="alert alert-info">
+							<i class="fas fa-info-circle"></i> Contact Administrator to obtain your login details
+						</div>
+						<fieldset>
+							<div class="form-group">
+								{{ form.email.label(class='form-control-label') }}
+
+								{% if form.email.errors %}
+									{{ form.email(class='form-control is-invalid')}}
+									<div class="invalid-feedback">
+										{% for error in form.email.errors %}
+											<span>{{ error }}</span>
+										{% endfor %}
+									</div>
+								{% else%}
+									{{ form.email(class='form-control') }}
+								{% endif %}
+							</div>
+							<div class="form-group">
+								{{ form.password.label(class='form-control-label') }}
+
+								{% if form.password.errors %}
+									{{ form.password(class='form-control is-invalid')}}
+									<div class="invalid-feedback">
+										{% for error in form.password.errors %}
+											<span>{{ error }}</span>
+										{% endfor %}
+									</div>
+								{% else%}
+									{{ form.password(class='form-control') }}
+								{% endif %}
+							</div>
+							<div class="form-check">
+								{{ form.remember(class='form-check-input')}}
+								{{ form.remember.label(class='form-check-label')}}
+							</div>
+						</fieldset>
+						<div>
+							{{ form.submit(class='btn btn-primary')}}
+						</div>
+						
+						</div>
+					</div>
+				</form>
+			</div>
+			
+		</div>
+	</div>
+	
+</div>
+{%endblock%}
