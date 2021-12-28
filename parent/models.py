@@ -10,7 +10,7 @@ class User(db.Model):
 	password = db.Column(db.String(119), nullable=False)
 
 	def __repr__(self):
-		return f"User('{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
+		return f"User('{self.id}', '{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
 
 class Group(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
