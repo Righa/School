@@ -8,7 +8,40 @@
 	<title>{%block title%}{%endblock%}</title>
 </head>
 <body>
-	{% if nav=='dash' %}
+	{% if nav=='landing' %}
+		<nav class="navbar navbar-expand-lg navbar-dark bg-info">
+		  <a class="navbar-brand" href="#"><i class="fas fa-university"></i> Good Academy</a>
+		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		    <span class="navbar-toggler-icon"></span>
+		  </button>
+
+		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		  	<div class="mr-auto"></div>
+		  	<ul class="navbar-nav">
+		  		<li class="nav-item">
+		  			<a href="#" class="nav-link active">HOME</a>
+		  		</li>
+			    <li class="nav-item dropdown">
+			        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PORTAL</a>
+			        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			          <a class="dropdown-item" href="{{ url_for('student_login') }}">STUDENT</a>
+			          <a class="dropdown-item" href="{{ url_for('admin_login') }}">TEACHER</a>
+			        </div>
+			    </li>
+		  		<li class="nav-item">
+		  			<a href="#" class="nav-link">EVENTS</a>
+		  		</li>
+		  		<li class="nav-item">
+		  			<a href="#" class="nav-link">BLOGS</a>
+		  		</li>
+		  		<li class="nav-item">
+		  			<a href="#" class="nav-link">CONTACTS</a>
+		  		</li>
+		  	</ul>
+
+		  </div>
+		</nav>
+	{% elif nav=='dash' %}
 		<nav class="navbar navbar-expand-lg navbar-dark bg-info">
 		  <a class="navbar-brand" href="#"><i class="fas fa-university"></i> Good Academy</a>
 		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,16 +54,6 @@
 		      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
 		      <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
 		    </form>
-		    <!--<div class="nav-item dropdown">
-		        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		          <i class="fas fa-user-circle"></i>
-		        </a>
-		        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-		          <a class="dropdown-item" href="{{ url_for('student_login') }}">Student</a>
-		          <a class="dropdown-item" href="{{ url_for('admin_login') }}">Teacher</a>
-		        </div>
-		    </div>-->
-
 		  </div>
 		</nav>
 	{% endif %}
@@ -50,6 +73,27 @@
 	</div>
 
 	{%block content%} {%endblock%}
+
+	<div class="row bg-info text-white">
+		<div class="col p-5">
+			<div class="row">
+				<div class="col p-5">
+					<h1 class="display-1">GOOD ACADEMY</h1>
+				</div>
+				<div class="col p-5">
+					<h1>Image Credits</h1>
+					<ul>
+						<li><a href="">Carousel Image 1</a></li>
+						<li><a href="">Carousel Image 2</a></li>
+						<li><a href="">Carousel Image 3</a></li>
+						<li><a href="">Carousel Image 4</a></li>
+						<li><a href="">Carousel Image 5</a></li>
+					</ul>
+				</div>
+				<div class="col p-5"></div>
+			</div>
+		</div>
+	</div>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
