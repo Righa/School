@@ -1,0 +1,19 @@
+::-moz-selection { /* Code for Firefox */
+  color: white;
+  background: teal;
+}
+
+::selection {
+  color: white;
+  background: teal;
+}
+
+.text-white ::-moz-selection {
+  color: teal;
+  background: white;
+}
+
+.text-white ::selection {
+  color: teal;
+  background: white;
+}

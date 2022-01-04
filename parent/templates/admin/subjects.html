@@ -1,0 +1,45 @@
+{% extends 'admin-dash.html' %}
+
+
+{% block pagedata %}
+{% if action=='create' %}
+
+{% elif action=='read' %}
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+	</div>
+</div>
+
+<div class="card">
+	<div class="card-body">
+		<h3 class="card-title">SUBJECTS</h3>
+		<div class="card">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>FULL NAME</th><th>EMAIL</th><th>ACTIONS</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>nai jdnk dihb</td>
+							<td>dhmfof</td>
+							<td>
+								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
+								<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% elif action=='update' %}
+
+{% elif action=='delete' %}
+
+{% endif %}
+{% endblock %}

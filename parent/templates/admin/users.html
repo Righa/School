@@ -1,0 +1,138 @@
+{% extends 'admin-dash.html' %}
+
+{% block pagedata %}
+{% if action=='create' %}
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+	</div>
+</div>
+<div class="card p-3" onload="changeNav('users')">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Register New User</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<div class="alert alert-info">
+				<i class="fas fa-info-circle"></i> The default password for new accounts is 'welcome'
+			</div>
+			<fieldset>
+				<div class="form-group">
+					{{ form.first_name.label(class='form-control-label') }}
+
+					{% if form.first_name.errors %}
+						{{ form.first_name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.first_name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.first_name(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.middle_name.label(class='form-control-label') }}
+
+					{% if form.middle_name.errors %}
+						{{ form.middle_name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.middle_name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.middle_name(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.last_name.label(class='form-control-label') }}
+
+					{% if form.last_name.errors %}
+						{{ form.last_name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.last_name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.last_name(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.email.label(class='form-control-label') }}
+
+					{% if form.email.errors %}
+						{{ form.email(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.email.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.email(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% elif action=='read' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('create_user') }}"><i class="fas fa-plus"></i> ADD USERS</a>
+	</div>
+</div>
+<div class="card">
+	<div class="card-body">
+		<h3 class="card-title">USERS</h3>
+		<div class="card">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>FULL NAME</th><th>EMAIL</th><th>ACTIONS</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>nai jdnk dihb</td>
+							<td>dhmfof</td>
+							<td>
+								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
+								<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% elif action=='update' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+	</div>
+</div>
+
+{% elif action=='delete' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+	</div>
+</div>
+
+{% endif %}
+{% endblock %}

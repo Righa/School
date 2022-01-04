@@ -1,0 +1,18 @@
+{% extends 'admin-dash.html' %}
+
+
+{% block pagedata %}
+{% if action=='create' %}
+
+{% elif action=='read' %}
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+	</div>
+</div>
+{% elif action=='update' %}
+
+{% elif action=='delete' %}
+
+{% endif %}
+{% endblock %}
