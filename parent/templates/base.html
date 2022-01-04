@@ -4,10 +4,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-	<link rel="stylesheet" href="static/main.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	<title>{%block title%}{%endblock%}</title>
 </head>
-<body>
+<body onload="changeNav('{{page}}')">
 	{% if nav=='landing' %}
 		<nav class="navbar navbar-expand-lg navbar-dark bg-info">
 		  <a class="navbar-brand" href="#"><i class="fas fa-university"></i> Good Academy</a>
@@ -82,15 +83,25 @@
 				</div>
 				<div class="col p-5">
 					<h1>Image Credits</h1>
-					<ul>
-						<li><a href="">Carousel Image 1</a></li>
-						<li><a href="">Carousel Image 2</a></li>
-						<li><a href="">Carousel Image 3</a></li>
-						<li><a href="">Carousel Image 4</a></li>
-						<li><a href="">Carousel Image 5</a></li>
-					</ul>
+					<a class="btn btn-outline-light my-1" href="">Carousel Image 1 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href="">Carousel Image 2 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href="">Carousel Image 3 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href="">Carousel Image 4 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href="">Carousel Image 5 <i class="fas fa-external-link-alt"></i></a>
 				</div>
-				<div class="col p-5"></div>
+				<div class="col p-5">
+					<h1>Contacts</h1>
+					<a class="btn btn-outline-light my-1" href=""><i class="fas fa-envelope"></i> info@goodacademy.edu <i class="fas fa-external-link-alt"></i></a>
+					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
+					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
+					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
+				</div>
+				<div class="col p-5">
+					<h1>Social</h1>
+					<a class="btn btn-outline-light my-1" href=""><i class="fab fa-instagram"></i> good_academy <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href=""><i class="fab fa-facebook"></i> good_academy <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href=""><i class="fab fa-twitter"></i> good_academy <i class="fas fa-external-link-alt"></i></a>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -99,7 +110,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<script src="https://kit.fontawesome.com/4c9bf4cf75.js" crossorigin="anonymous"></script>
-	<script src="static/main.js"></script>
+	<script src="{{ url_for('static', filename='main.js') }}"></script>
 
 
 	

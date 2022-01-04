@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{%block title%}Home Page{%endblock%}
+{%block title%}Dashboard{%endblock%}
 {%block content%}
 <div class="row border border-info">
 	<div class="col-2">
@@ -26,47 +26,31 @@
 					
 				</div>
 			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-chart-pie"></i> ANALYTICS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-user-circle"></i> STUDENTS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-book"></i> SUBJECTS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-stream"></i> EXAMS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-user-graduate"></i> CAREERS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-user-md"></i> ALUMNI</div>
-			</div>
+			<a id="analytics" class="row nav-link btn-outline-info p-3" href="{{ url_for('admin_dash') }}">
+				<div class="col"><i class="fas fa-chart-pie"></i> ANALYTICS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="users" class="row nav-link nav-link btn-outline-info p-3" href="{{ url_for('create_user') }}">
+				<div class="col"><i class="fas fa-user-circle"></i> USERS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="students" class="row nav-link btn-outline-info p-3" href="{{ url_for('students') }}">
+				<div class="col"><i class="fas fa-user-circle"></i> STUDENTS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="subjects" class="row nav-link btn-outline-info p-3" href="{{ url_for('subjects') }}">
+				<div class="col"><i class="fas fa-book"></i> SUBJECTS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="exams" class="row nav-link btn-outline-info p-3" href="{{ url_for('exams') }}">
+				<div class="col"><i class="fas fa-stream"></i> EXAMS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="careers" class="row nav-link btn-outline-info p-3" href="{{ url_for('careers') }}">
+				<div class="col"><i class="fas fa-user-graduate"></i> CAREERS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="alumni" class="row nav-link btn-outline-info p-3" href="{{ url_for('alumni') }}">
+				<div class="col"><i class="fas fa-user-md"></i> ALUMNI <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
 		</div>
 	</div>
-	<div class="col-6 border-left border-info">
-		<div class="p-5">dddddddddddddddddddddd</div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-		<div class="p-5"></div>
-	</div>
-	<div class="col-2 border-left border-info text-info">
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
-		<div class="p-3"><i class="fas fa-chevron-right"></i> <b>Anouncement</b></div>
+	<div class="col border-left border-info">
+		{%block pagedata%}{%endblock%}
 	</div>
 </div>
 {%endblock%}
