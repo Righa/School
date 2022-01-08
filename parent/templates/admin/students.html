@@ -5,10 +5,11 @@
 {% if action=='create' %}
 <div class="row">
 	<div class="col p-3">
-		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('students') }}"><i class="fas fa-list"></i> VIEW STUDENTS</a>
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('create_group') }}"><i class="fas fa-plus"></i> ADD GROUP</a>
 	</div>
 </div>
-<div class="card p-3" onload="changeNav('users')">
+<div class="card p-3">
 	<div class="card-body text-primary">
 		<h1 class="card-title text-info">Register New Student</h1>
 	</div>
@@ -88,7 +89,8 @@
 {% elif action=='read' %}
 <div class="row">
 	<div class="col p-3">
-		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('create_student') }}"><i class="fas fa-plus"></i> ADD STUDENTS</a>
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('students') }}"><i class="fas fa-plus"></i> ADD GROUP</a>
 	</div>
 </div>
 <div class="card">
@@ -99,18 +101,21 @@
 				<table class="table table-hover">
 					<thead>
 						<tr>
-							<th>FULL NAME</th><th>EMAIL</th><th>ACTIONS</th>
+							<th>FULL NAME</th><th>EMAIL</th><th>CLASS</th><th>ACTIONS</th>
 						</tr>
 					</thead>
 					<tbody>
+						{% for student in students %}
 						<tr>
-							<td>nai jdnk dihb</td>
-							<td>dhmfof</td>
+							<td>{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</td>
+							<td>{% print(student.email) %}</td>
+							<td>{% print(student.group.name) %}</td>
 							<td>
 								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
 								<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>

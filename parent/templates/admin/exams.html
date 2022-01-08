@@ -4,10 +4,92 @@
 {% block pagedata %}
 {% if action=='create' %}
 
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('exams') }}"><i class="fas fa-list"></i> VIEW EXAMS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Add New Exam</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.year.label(class='form-control-label') }}
+
+					{% if form.year.errors %}
+						{{ form.year(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.year.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.year(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.term.label(class='form-control-label') }}
+
+					{% if form.term.errors %}
+						{{ form.term(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.term.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.term(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
 {% elif action=='read' %}
 <div class="row">
 	<div class="col p-3">
-		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+		<a class="btn float-right btn-outline-info" href="{{ url_for('create_exam') }}"><i class="fas fa-plus"></i> ADD EXAM</a>
+	</div>
+</div>
+<div class="card">
+	<div class="card-body">
+		<h3 class="card-title">EXAMS</h3>
+		<div class="card">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>SUBJECT</th><th>YEAR</th><th>TERM</th><th>CLASS</th><th>ACTIONS</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for exam in exams %}
+						<tr>
+							<td>{% print(exam.subject.name) %}</td>
+							<td>{% print(exam.year) %}</td>
+							<td>{% print(exam.term) %}</td>
+							<td>{% print(exam.group.name) %}</td>
+							<td>
+								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
+								<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
+								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="ADD QUESTIONS"><i class="fas fa-plus "></i></a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </div>
 {% elif action=='update' %}

@@ -1,0 +1,51 @@
+{% extends 'admin-dash.html' %}
+
+
+{% block pagedata %}
+{% if action=='create' %}
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('create_student') }}"><i class="fas fa-plus"></i> ADD STUDENTS</a>
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('students') }}"><i class="fas fa-list"></i> VIEW STUDENTS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Add New Group</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.name.label(class='form-control-label') }}
+
+					{% if form.name.errors %}
+						{{ form.name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.name(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% elif action=='read' %}
+
+{% elif action=='update' %}
+
+{% elif action=='delete' %}
+
+{% endif %}
+{% endblock %}
