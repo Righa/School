@@ -103,14 +103,16 @@
 						</tr>
 					</thead>
 					<tbody>
+						{% for user in users %}
 						<tr>
-							<td>nai jdnk dihb</td>
-							<td>dhmfof</td>
+							<td>{% print(user.first_name) %} {% print(user.middle_name) %} {% print(user.last_name) %}</td>
+							<td>{% print(user.email) %}</td>
 							<td>
 								<a href="#" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
 								<a href="#" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
 							</td>
 						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>

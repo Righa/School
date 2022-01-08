@@ -1,7 +1,7 @@
 from flask import redirect, url_for, render_template, flash
 from parent import app, db, bcrypt
-from parent.forms import LoginForm, RegistrationForm
-from parent.models import User
+from parent.forms import *
+from parent.models import *
 
 ##landing
 
@@ -43,7 +43,7 @@ def student_dash():
 
 @app.route('/users/create', methods=['POST', 'GET'])
 def create_user():
-	form = RegistrationForm()
+	form = UserForm()
 	if form.validate_on_submit():
 		hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
 		user = User(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, password=hashed_password)
@@ -52,11 +52,24 @@ def create_user():
 		flash(f'Registration successful!', 'success')
 	return render_template('admin/users.html', nav='dash', page='users', action='create', form=form)
 
+## groups create
+
+@app.route('/groups/create', methods=['POST', 'GET'])
+def create_group():
+	form = GroupForm()
+	if form.validate_on_submit():
+		group = Group(name=form.name.data)
+		db.session.add(group)
+		db.session.commit()
+		flash(f'Group created!', 'success')
+	return render_template('admin/groups.html', nav='dash', page='users', action='create', form=form)
+
 ## users read
 
 @app.route('/users', methods=['POST', 'GET'])
 def users():
-	return render_template('admin/users.html', nav='dash', page='users', action='read')
+	users = User.query.all()
+	return render_template('admin/users.html', nav='dash', page='users', users=users, action='read')
 
 ## users update
 
@@ -74,13 +87,21 @@ def delete_user():
 
 @app.route('/students/create', methods=['POST', 'GET'])
 def create_student():
-	return render_template('admin/students.html', nav='dash', page='students', action='create')
+	form = StudentForm()
+	if form.validate_on_submit():
+		hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
+		student = Student(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, group_id=1, password=hashed_password)
+		db.session.add(student)
+		db.session.commit()
+		flash(f'Registration successful!', 'success')
+	return render_template('admin/students.html', nav='dash', page='students', action='create', form=form)
 
 ## students read
 
 @app.route('/students', methods=['POST', 'GET'])
 def students():
-	return render_template('admin/students.html', nav='dash', page='students', action='read')
+	students = Student.query.all()
+	return render_template('admin/students.html', nav='dash', page='students', students=students, action='read')
 
 ## students update
 
@@ -98,13 +119,20 @@ def delete_student():
 
 @app.route('/subjects/create', methods=['POST', 'GET'])
 def create_subject():
-	return render_template('admin/subjects.html', nav='dash', page='subjects', action='create')
+	form = SubjectForm()
+	if form.validate_on_submit():
+		subject = Subject(name=form.name.data)
+		db.session.add(subject)
+		db.session.commit()
+		flash('Subject added successfully', 'success')
+	return render_template('admin/subjects.html', nav='dash', page='subjects', action='create', form=form)
 
 ## subjects read
 
 @app.route('/subjects', methods=['POST', 'GET'])
 def subjects():
-	return render_template('admin/subjects.html', nav='dash', page='subjects', action='read')
+	subjects = Subject.query.all()
+	return render_template('admin/subjects.html', nav='dash', page='subjects', subjects=subjects, action='read')
 
 ## subjects update
 
@@ -122,13 +150,20 @@ def delete_subject():
 
 @app.route('/exams/create', methods=['POST', 'GET'])
 def create_exam():
-	return render_template('admin/exams.html', nav='dash', page='exams', action='create')
+	form = ExamForm()
+	if form.validate_on_submit():
+		exam = Exam(year=form.year.data, term=form.term.data, subject_id=1, group_id=1)
+		db.session.add(exam)
+		db.session.commit()
+		flash('Exam added successfully', 'success')
+	return render_template('admin/exams.html', nav='dash', page='exams', action='create', form=form)
 
 ## exams read
 
 @app.route('/exams', methods=['POST', 'GET'])
 def exams():
-	return render_template('admin/exams.html', nav='dash', page='exams', action='read')
+	exams = Exam.query.all()
+	return render_template('admin/exams.html', nav='dash', exams=exams, page='exams', action='read')
 
 ## exams update
 
