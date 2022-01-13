@@ -41,6 +41,8 @@ class Student(db.Model):
 	group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
 	password = db.Column(db.String(119), nullable=False)
 
+	
+
 	def __repr__(self):
 		return f"Student('{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
 

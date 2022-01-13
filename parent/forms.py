@@ -1,7 +1,13 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from parent.models import *
+
+
+def group_query():
+	return Group.query
+
 
 class UserForm(FlaskForm):
 	first_name = StringField('First Name', validators=[DataRequired(), Length(min=3, max=19)])
@@ -24,6 +30,7 @@ class StudentForm(FlaskForm):
 	middle_name = StringField('Middle Name', validators=[DataRequired(), Length(min=3, max=19)])
 	last_name = StringField('Last Name', validators=[DataRequired(), Length(min=3, max=19)])
 	email = StringField('Email', validators=[DataRequired(), Email()])
+	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='name')
 
 	def validate_email(self, email):
 

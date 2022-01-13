@@ -10,6 +10,11 @@ from parent.models import *
 def home():
 	return render_template('index.html', nav='landing')
 
+#@app.route('/home/<dt>')
+#def home(dt):
+	#User.query.filter_by/filter(x>y)
+	#return render_template('index.html', nav='landing')
+
 ## auth
 
 @app.route('/admin-login', methods=['POST','GET'])
@@ -90,7 +95,7 @@ def create_student():
 	form = StudentForm()
 	if form.validate_on_submit():
 		hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
-		student = Student(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, group_id=1, password=hashed_password)
+		student = Student(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, group_id=form.group.data.id, password=hashed_password)
 		db.session.add(student)
 		db.session.commit()
 		flash(f'Registration successful!', 'success')
