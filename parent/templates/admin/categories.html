@@ -1,0 +1,140 @@
+{% extends 'admin-dash.html' %}
+
+
+{% block pagedata %}
+{% if action=='create' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('subjects') }}"><i class="fas fa-list"></i> VIEW SUBJECTS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Add New Category</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.name.label(class='form-control-label') }}
+
+					{% if form.name.errors %}
+						{{ form.name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.name(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.minimum.label(class='form-control-label') }}
+
+					{% if form.minimum.errors %}
+						{{ form.minimum(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.minimum.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.minimum(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.maximum.label(class='form-control-label') }}
+
+					{% if form.maximum.errors %}
+						{{ form.maximum(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.maximum.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.maximum(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% elif action=='update' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('subjects') }}"><i class="fas fa-list"></i> VIEW SUBJECTS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Edit Category</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.name.label(class='form-control-label') }}
+
+					{% if form.name.errors %}
+						{{ form.name(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.name(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.minimum.label(class='form-control-label') }}
+
+					{% if form.minimum.errors %}
+						{{ form.minimum(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.minimum.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.minimum(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.maximum.label(class='form-control-label') }}
+
+					{% if form.maximum.errors %}
+						{{ form.maximum(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.maximum.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.maximum(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% endif %}
+{% endblock %}

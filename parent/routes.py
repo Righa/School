@@ -10,11 +10,6 @@ from parent.models import *
 def home():
 	return render_template('index.html', nav='landing')
 
-#@app.route('/home/<dt>')
-#def home(dt):
-	#User.query.filter_by/filter(x>y)
-	#return render_template('index.html', nav='landing')
-
 ## auth
 
 @app.route('/admin-login', methods=['POST','GET'])
@@ -94,11 +89,21 @@ def update_user(id):
 		form.last_name.data = user.last_name
 	return render_template('admin/users.html', nav='dash', page='users', action='update', form=form)
 
+## users view
+
+@app.route('/users/view/<id>', methods=['POST', 'GET'])
+def view_user(id):
+	return render_template('admin/users.html', nav='dash', page='users', action='view')
+
 ## users delete
 
 @app.route('/users/delete/<id>', methods=['POST', 'GET'])
 def delete_user(id):
-	return render_template('admin/users.html', nav='dash', page='users', action='delete')
+	user = User.query.get_or_404(id)
+	user.delete()
+	db.session.commit()
+	flash(f'User has been deleted!', 'success')
+	return redirect(url_for('users'))
 
 ## students create
 
@@ -140,11 +145,21 @@ def update_student(id):
 		form.group.data = student.group
 	return render_template('admin/students.html', nav='dash', page='students', action='update', form=form)
 
+## students view
+
+@app.route('/students/view/<id>', methods=['POST', 'GET'])
+def view_student(id):
+	return render_template('admin/students.html', nav='dash', page='students', action='view')
+
 ## students delete
 
 @app.route('/students/delete/<id>', methods=['POST', 'GET'])
 def delete_student(id):
-	return render_template('admin/students.html', nav='dash', page='students', action='delete')
+	student = Student.query.get_or_404(id)
+	student.delete()
+	db.session.commit()
+	flash(f'Student has been deleted!', 'success')
+	return redirect(url_for('users'))
 
 ## subjects create
 
@@ -179,11 +194,62 @@ def update_subject(id):
 		form.name.data = subject.name
 	return render_template('admin/subjects.html', nav='dash', page='subjects', action='update', form=form)
 
+## subjects view
+
+@app.route('/subjects/view/<id>', methods=['POST', 'GET'])
+def view_subject(id):
+	return render_template('admin/subjects.html', nav='dash', page='subjects', action='view')
+
 ## subjects delete
 
 @app.route('/subjects/delete/<id>', methods=['POST', 'GET'])
 def delete_subject(id):
-	return render_template('admin/subjects.html', nav='dash', page='subjects', action='delete')
+	subject = Subject.query.get_or_404(id)
+	subject.delete()
+	db.session.commit()
+	flash(f'Subject has been deleted!', 'success')
+	return redirect(url_for('users'))
+
+## categories create
+
+@app.route('/categories/create/<id>', methods=['POST', 'GET'])
+def create_category(id):
+	subject = Subject.query.get_or_404(id)
+	form = CategoryForm()
+	if form.validate_on_submit():
+		category = Category(name=form.name.data, minimum=form.minimum.data, maximum=form.maximum.data, subject_id=id)
+		db.session.add(category)
+		db.session.commit()
+		flash('Category added successfully', 'success')
+	return render_template('admin/categories.html', nav='dash', page='subjects', action='create', form=form)
+
+## categories update
+
+@app.route('/categories/update/<id>', methods=['POST', 'GET'])
+def update_category(id):
+	category = Category.query.get_or_404(id)
+	form = QuestionForm()
+	if form.validate_on_submit():
+		category.name=form.name.data
+		category.minimum=form.minimum.data
+		category.maximum=form.maximum.data
+		db.session.commit()
+		flash('Category updated successfully', 'success')
+	elif request.method == 'GET':
+		form.name.data=category.name
+		form.minimum.data=category.minimum
+		form.maximum.data=category.maximum
+	return render_template('admin/categories.html', nav='dash', page='subjects', action='update', form=form)
+
+## categories delete
+
+@app.route('/categories/delete/<id>', methods=['POST', 'GET'])
+def delete_category(id):
+	category = Category.query.get_or_404(id)
+	category.delete()
+	db.session.commit()
+	flash(f'Category has been deleted!', 'success')
+	return redirect(url_for('users'))
 
 ## exams create
 
@@ -216,7 +282,7 @@ def update_exam(id):
 		exam.subject_id = form.subject.data.id
 		exam.group_id = form.group.data.id
 		db.session.commit()
-		flash('Exam added successfully', 'success')
+		flash('Exam updated successfully', 'success')
 	elif request.method == 'GET':
 		form.year.data = exam.year
 		form.term.data = exam.term
@@ -224,11 +290,61 @@ def update_exam(id):
 		form.group.data = exam.group
 	return render_template('admin/exams.html', nav='dash', page='exams', action='update', form=form)
 
+## exams view
+
+@app.route('/exams/view/<id>', methods=['POST', 'GET'])
+def view_exam(id):
+	return render_template('admin/exams.html', nav='dash', page='exams', action='view')
+
 ## exams delete
 
 @app.route('/exams/delete/<id>', methods=['POST', 'GET'])
 def delete_exam(id):
-	return render_template('admin/exams.html', nav='dash', page='exams', action='delete')
+	exam = Exam.query.get_or_404(id)
+	exam.delete()
+	db.session.commit()
+	flash(f'Exam has been deleted!', 'success')
+	return redirect(url_for('users'))
+
+## questions create
+
+@app.route('/questions/create/<id>', methods=['POST', 'GET'])
+def create_question(id):
+	form = QuestionForm()
+	exam= Exam.query.get(id)
+	subject_id = exam.subject_id
+	form.category.query = Category.query.filter(Category.subject_id == subject_id)
+	if form.validate_on_submit():
+		question = Question(number=form.number.data, category_id=form.category.data.id, exam_id=id)
+		db.session.add(question)
+		db.session.commit()
+		flash('Question added successfully', 'success')
+	return render_template('admin/questions.html', nav='dash', page='exams', action='create', form=form)
+
+## questions update
+
+@app.route('/questions/update/<id>', methods=['POST', 'GET'])
+def update_question(id):
+	question = Question.query.get_or_404(id)
+	form = QuestionForm()
+	if form.validate_on_submit():
+		question.category_id = form.category.data.id
+		db.session.commit()
+		flash('Question updated successfully', 'success')
+	elif request.method == 'GET':
+		form.category.data = question.category
+		form.exam.data = question.exam
+	return render_template('admin/questions.html', nav='dash', page='exams', action='update', form=form)
+
+## questions delete
+
+@app.route('/questions/delete/<id>', methods=['POST', 'GET'])
+def delete_question(id):
+	question = Question.query.get_or_404(id)
+	question.delete()
+	db.session.commit()
+	flash(f'Question has been deleted!', 'success')
+	return redirect(url_for('exams'))
 
 ## careers create
 
@@ -248,11 +364,21 @@ def careers():
 def update_career(id):
 	return render_template('admin/careers.html', nav='dash', page='careers', action='update')
 
+## careers view
+
+@app.route('/careers/view/<id>', methods=['POST', 'GET'])
+def view_career(id):
+	return render_template('admin/careers.html', nav='dash', page='careers', action='view')
+
 ## careers delete
 
 @app.route('/careers/delete/<id>', methods=['POST', 'GET'])
 def delete_career(id):
-	return render_template('admin/careers.html', nav='dash', page='careers', action='delete')
+	career = Career.query.get_or_404(id)
+	career.delete()
+	db.session.commit()
+	flash(f'Career has been deleted!', 'success')
+	return redirect(url_for('careers'))
 
 ## alumni create
 
@@ -272,8 +398,18 @@ def alumni():
 def update_alumni(id):
 	return render_template('admin/alumni.html', nav='dash', page='alumni', action='update')
 
+## alumni view
+
+@app.route('/alumni/view/<id>', methods=['POST', 'GET'])
+def view_alumni(id):
+	return render_template('admin/alumni.html', nav='dash', page='alumni', action='view')
+
 ## alumni delete
 
 @app.route('/alumni/delete/<id>', methods=['POST', 'GET'])
 def delete_alumni(id):
-	return render_template('admin/alumni.html', nav='dash', page='alumni', action='delete')
+	alumni = Alumni.query.get_or_404(id)
+	alumni.delete()
+	db.session.commit()
+	flash(f'Alumni has been deleted!', 'success')
+	return redirect(url_for('alumni'))

@@ -1,0 +1,112 @@
+{% extends 'admin-dash.html' %}
+
+
+{% block pagedata %}
+{% if action=='create' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('exams') }}"><i class="fas fa-list"></i> VIEW EXAMS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Add New Question</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.number.label(class='form-control-label') }}
+
+					{% if form.number.errors %}
+						{{ form.number(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.number.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.number(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.category.label(class='form-control-label') }}
+
+					{% if form.category.errors %}
+						{{ form.category(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.category.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.category(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% elif action=='update' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('exams') }}"><i class="fas fa-list"></i> VIEW EXAMS</a>
+	</div>
+</div>
+<div class="card p-3">
+	<div class="card-body text-primary">
+		<h1 class="card-title text-info">Edit Question</h1>
+	</div>
+	<form class="card" method="post">
+		{{ form.hidden_tag() }}
+		<div class="card-body">
+			<fieldset>
+				<div class="form-group">
+					{{ form.number.label(class='form-control-label') }}
+
+					{% if form.number.errors %}
+						{{ form.number(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.number.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.number(class='form-control') }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.category.label(class='form-control-label') }}
+
+					{% if form.category.errors %}
+						{{ form.category(class='form-control is-invalid')}}
+						<div class="invalid-feedback">
+							{% for error in form.category.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else%}
+						{{ form.category(class='form-control') }}
+					{% endif %}
+				</div>
+			</fieldset>
+			<div>
+				{{ form.submit(class='btn btn-info')}}
+			</div>
+			
+			</div>
+		</div>
+	</form>
+</div>
+
+{% endif %}
+{% endblock %}
