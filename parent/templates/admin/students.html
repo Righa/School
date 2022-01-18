@@ -109,17 +109,23 @@
 </div>
 <div class="card">
 	<div class="card-body">
-		<h3 class="card-title">STUDENTS</h3>
-		<div class="card">
-			<div class="table-responsive">
+		<h3 class="card-title text-info">STUDENTS</h3>
+
+		{% for group in groups %}
+		<div class="card my-3">
+			<div class="card-header bg-info text-white" data-toggle="collapse" data-target="#{% print(group.id) %}" aria-expanded="false" aria-controls="{% print(group.id) %}">
+				<h3 class="card-title">Class of: {% print(group.year) %} <i class="fas fa-chevron-down float-right"></i></h3>
+			</div>
+			<div id="{% print(group.id) %}" class="collapse card-body table-responsive">
+				{% if group.students|length > 0 %}
 				<table class="table table-hover">
 					<thead>
-						<tr>
+						<tr class="text-info">
 							<th>FULL NAME</th><th>EMAIL</th><th>CLASS</th><th>ACTIONS</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% for student in students %}
+						{% for student in group.students %}
 						<tr>
 							<td>{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</td>
 							<td>{% print(student.email) %}</td>
@@ -133,8 +139,17 @@
 						{% endfor %}
 					</tbody>
 				</table>
+				{% else %}
+				<div class="card-body">
+					<div class="alert alert-info">
+						There are no students in this group
+						<a class="float-right text-info" href="{{ url_for('create_student') }}"> <strong>add students <i class="fas fa-external-link-alt"></i></strong></a>
+					</div>
+				</div>
+				{% endif %}
 			</div>
 		</div>
+		{% endfor %}
 	</div>
 </div>
 

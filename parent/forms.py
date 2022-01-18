@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm, Form
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FieldList, FormField
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FieldList, HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange, Optional
 from parent.models import *
@@ -37,7 +37,7 @@ class UserForm(EditUserForm):
 			raise ValidationError('Email has already been taken')
 
 class StudentForm(UserForm):
-	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='name')
+	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='year')
 
 class ChangePasswordForm(FlaskForm):
 	password = PasswordField('Current Password', validators=[DataRequired()])
@@ -56,14 +56,14 @@ class SubjectForm(FlaskForm):
 	submit = SubmitField('Submit')
 
 class ExamForm(FlaskForm):
-	year = StringField('Year', validators=[DataRequired(), Length(min=3, max=19)])
-	term = StringField('Term', validators=[DataRequired(), Length(min=1, max=19)])
-	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='name')
+	year = IntegerField('Year', validators=[NumberRange(min=2021)])
+	term = IntegerField('Term', validators=[NumberRange(min=1, max=3)])
+	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='year')
 	subject = QuerySelectField('Subject', query_factory=subject_query, allow_blank=False, get_label='name')
 	submit = SubmitField('Submit')
 
 class GroupForm(FlaskForm):
-	name = StringField('Name', validators=[DataRequired(), Length(min=3, max=19)])
+	year = IntegerField('Year', validators=[NumberRange(min=2021)])
 	submit = SubmitField('Submit')
 
 class CategoryForm(FlaskForm):
@@ -78,9 +78,6 @@ class QuestionForm(FlaskForm):
 	submit = SubmitField('Submit')
 
 class ScoreForm(FlaskForm):
-	scores = FieldList(FormField(Score))
+	scores = FieldList(IntegerField('', validators=[Optional()]), min_entries=111)
 	submit = SubmitField('Save')
-
-class Score(Form):
-	value = IntegerField(validators=[Optional()])
 	
