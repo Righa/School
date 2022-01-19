@@ -78,6 +78,5 @@ class QuestionForm(FlaskForm):
 	submit = SubmitField('Submit')
 
 class ScoreForm(FlaskForm):
-	scores = FieldList(IntegerField('', validators=[Optional()]), min_entries=111)
 	submit = SubmitField('Save')
 	

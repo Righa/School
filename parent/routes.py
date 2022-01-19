@@ -375,29 +375,20 @@ def delete_question(id):
 def create_scores(id):
 	exam= Exam.query.get_or_404(id)
 	form = ScoreForm()
-
-	for student in exam.group.students:
-		for question in exam.questions:
-			if Score.query.filter_by(question_id=question.id, student_id=student.id).first():
-				score = Score.query.filter_by(question_id=question.id, student_id=student.id).first()
-				form.scores[question.number-1].data = score.value
 			
 	if request.method == 'POST':
 		student_id = request.form['student_id']
 
-		#for question in exam.questions:
-
-		if Score.query.filter_by(question_id=question.id, student_id=student_id).first():
-			score = Score.query.filter_by(question_id=question.id, student_id=student_id).first()
-			score.value=form.scores[question.number-1].data
-			db.session.commit()
-
-			#else:
-				#score = Score(value=form.scores[question.number-1].data, question_id=question.id, student_id=student_id)
-				#db.session.add(score)
-				#db.session.commit()
-
-		flash(form.scores[0].data, 'success')
+		for question in exam.questions:
+			if Score.query.filter_by(question_id=question.id, student_id=student_id).first():
+				score = Score.query.filter_by(question_id=question.id, student_id=student_id).first()
+				score.value=request.form['score['+str(question.number)+']']
+				db.session.commit()
+			else:
+				score = Score(value=request.form['score['+str(question.number)+']'], question_id=question.id, student_id=student_id)
+				db.session.add(score)
+				db.session.commit()
+		flash('Scores have been captured successfully', 'success')
 		return redirect(url_for('create_scores', id=id))
 	return render_template('admin/scores.html', nav='dash', page='exams', action='create', exam=exam, form=form)
 
