@@ -92,8 +92,15 @@
 <div class="card">
 	<div class="card-body">
 		<h3 class="card-title">EXAMS</h3>
-		<div class="card">
-			<div class="table-responsive">
+
+
+		{% for group in groups %}
+
+		<div class="card my-3">
+			<div class="card-header bg-info text-white" data-toggle="collapse" data-target="#{% print(group.id) %}" aria-expanded="false" aria-controls="{% print(group.id) %}">
+				<h3 class="card-title">Class of: {% print(group.year) %} <i class="fas fa-chevron-down float-right"></i></h3>
+			</div>
+			<div class="collapse card-body table-responsive" id="{% print(group.id) %}">
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -101,24 +108,32 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for exam in exams %}
+
+						{% for exam in group.exams %}
+
 						<tr>
 							<td>{% print(exam.subject.name) %}</td>
 							<td>{% print(exam.year) %}</td>
 							<td>{% print(exam.term) %}</td>
-							<td>{% print(exam.group.name) %}</td>
+							<td>{% print(exam.group.year) %}</td>
 							<td>
 								<a href="{{ url_for('update_exam', id=exam.id) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-edit"></i></a>
 								<a href="{{ url_for('delete_exam', id=exam.id) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
 								<a href="questions/create/{{ exam.id }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="ADD QUESTIONS"><i class="fas fa-plus "></i></a>
+								<a href="scores/create/{{ exam.id }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="CAPTURE OUTCOMES"><i class="fas fa-plus "></i></a>
 								<a href="exams/view/{{ exam.id }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="MORE INFO"><i class="fas fa-eye "></i></a>
 							</td>
 						</tr>
+
 						{% endfor %}
+
 					</tbody>
 				</table>
 			</div>
 		</div>
+
+		{% endfor %}
+
 	</div>
 </div>
 {% elif action=='update' %}

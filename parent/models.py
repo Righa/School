@@ -7,6 +7,7 @@ class User(db.Model):
 	middle_name = db.Column(db.String(19), nullable=False)
 	last_name = db.Column(db.String(19), nullable=False)
 	email = db.Column(db.String(19), unique=True, nullable=False)
+	exams = db.relationship('Exam', backref='teacher', lazy=True, cascade='all, delete')
 	password = db.Column(db.String(119), nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
@@ -16,10 +17,10 @@ class User(db.Model):
 
 class Group(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(19), nullable=False)
-	students = db.relationship('Student', backref='group', lazy=True)
+	year = db.Column(db.String(19), nullable=False)
+	students = db.relationship('Student', backref='group', lazy=True, cascade='all, delete')
 	status = db.Column(db.String(19), nullable=False, default='ongoing')
-	exams = db.relationship('Exam', backref='group', lazy=True)
+	exams = db.relationship('Exam', backref='group', lazy=True, cascade='all, delete')
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
@@ -29,8 +30,8 @@ class Group(db.Model):
 class Subject(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(19), nullable=False)
-	categories = db.relationship('Category', backref='subject', lazy=True)
-	exams = db.relationship('Exam', backref='subject', lazy=True)
+	categories = db.relationship('Category', backref='subject', lazy=True, cascade='all, delete')
+	exams = db.relationship('Exam', backref='subject', lazy=True, cascade='all, delete')
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
@@ -43,8 +44,8 @@ class Student(db.Model):
 	middle_name = db.Column(db.String(19), nullable=False)
 	last_name = db.Column(db.String(19), nullable=False)
 	email = db.Column(db.String(19), unique=True, nullable=False)
-	scores = db.relationship('Score', backref='student', lazy=True)
-	careers = db.relationship('Career', backref='student', lazy=True)
+	scores = db.relationship('Score', backref='student', lazy=True, cascade='all, delete')
+	careers = db.relationship('Career', backref='student', lazy=True, cascade='all, delete')
 	group_id = db.Column(db.Integer, db.ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
 	password = db.Column(db.String(119), nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -60,7 +61,7 @@ class Category(db.Model):
 	name = db.Column(db.String(19), nullable=False)
 	minimum = db.Column(db.Integer, nullable=False)
 	maximum = db.Column(db.Integer, nullable=False)
-	questions = db.relationship('Question', backref='category', lazy=True)
+	questions = db.relationship('Question', backref='category', lazy=True, cascade='all, delete')
 	subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
@@ -72,9 +73,10 @@ class Exam(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	year = db.Column(db.Integer, nullable=False)
 	term = db.Column(db.Integer, nullable=False)
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 	group_id = db.Column(db.Integer, db.ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
 	subject_id = db.Column(db.Integer, db.ForeignKey('subject.id', ondelete='CASCADE'), nullable=False)
-	questions = db.relationship('Question', backref='exam', lazy=True)
+	questions = db.relationship('Question', backref='exam', lazy=True, cascade='all, delete')
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
@@ -86,7 +88,7 @@ class Question(db.Model):
 	number = db.Column(db.Integer, nullable=False)
 	category_id = db.Column(db.Integer, db.ForeignKey('category.id', ondelete='CASCADE'), nullable=False)
 	exam_id = db.Column(db.Integer, db.ForeignKey('exam.id', ondelete='CASCADE'), nullable=False)
-	scores = db.relationship('Score', backref='question', lazy=True)
+	scores = db.relationship('Score', backref='question', lazy=True, cascade='all, delete')
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
