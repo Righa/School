@@ -114,14 +114,14 @@
 		{% for group in groups %}
 		<div class="card my-3">
 			<div class="card-header bg-info text-white" data-toggle="collapse" data-target="#{% print(group.id) %}" aria-expanded="false" aria-controls="{% print(group.id) %}">
-				<h3 class="card-title">Class of: {% print(group.year) %} <i class="fas fa-chevron-down float-right"></i></h3>
+				<h3 class="card-title">Class: {% print(group.year) %} <i class="fas fa-chevron-down float-right"></i></h3>
 			</div>
 			<div id="{% print(group.id) %}" class="collapse card-body table-responsive">
 				{% if group.students|length > 0 %}
 				<table class="table table-hover">
 					<thead>
 						<tr class="text-info">
-							<th>FULL NAME</th><th>EMAIL</th><th>CLASS</th><th>ACTIONS</th>
+							<th>FULL NAME</th><th>EMAIL</th><th>ACTIONS</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -129,7 +129,6 @@
 						<tr>
 							<td>{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</td>
 							<td>{% print(student.email) %}</td>
-							<td>{% print(student.group.name) %}</td>
 							<td>
 								<a href="{{ url_for('update_student', id=student.id) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
 								<a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
@@ -239,6 +238,58 @@
 </div>
 
 {% elif action=='view' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info mr-3" href="{{ url_for('students') }}"><i class="fas fa-list"></i> VIEW STUDENTS</a>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="card text-info">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-1">img</div>
+					<div class="col">
+						<h3>{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</h3>
+					</div>
+					<div class="col">
+						<a class="btn btn-outline-info" href="{{ url_for('update_student', id=student.id) }}">UPDATE</a>
+						<a class="btn btn-outline-danger" href="{{ url_for('delete_student', id=student.id) }}">DELETE</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row my-3">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Performance Records</h3>
+			</div>
+			<div class="card-body table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Exam</th><th>Marks</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for exam in student.group.exams %}
+						<tr>
+							<td>{% print(exam.name) %}</td>
+							{% for category in exam.subject.categories %}
+								<td>category</td>
+							{% endfor%}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
 
 {% endif %}
 {% endblock %}

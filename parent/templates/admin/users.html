@@ -110,7 +110,6 @@
 							<td>
 								<a href="{{ url_for('update_user', id=user.id) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
 								<a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
-								<a href="users/view/{{ user.id }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="MORE INFO"><i class="fas fa-eye "></i></a>
 							</td>
 						</tr>
 						{% endfor %}
@@ -189,14 +188,6 @@
 			</div>
 		</div>
 	</form>
-</div>
-
-{% elif action=='view' %}
-
-<div class="row">
-	<div class="col p-3">
-		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
-	</div>
 </div>
 
 {% endif %}

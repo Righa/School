@@ -2,17 +2,151 @@
 
 
 {% block pagedata %}
-{% if action=='create' %}
+{% if action=='read' %}
 
-{% elif action=='read' %}
 <div class="row">
 	<div class="col p-3">
-		<a class="btn float-right btn-outline-info" href="{{ url_for('users') }}"><i class="fas fa-list"></i> VIEW USERS</a>
+		<a class="btn float-right btn-outline-info" href="{{ url_for('students') }}"><i class="fas fa-list"></i> VIEW STUDENTS</a>
 	</div>
 </div>
-{% elif action=='update' %}
 
-{% elif action=='delete' %}
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title text-info">Career Recommendation System</h3>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row my-3">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Ongoing Groups</h3>
+			</div>
+			<div class="card-body table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Class</th><th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for group in groups %}
+						<tr>
+							<td>{% print(group.year) %}</td>
+							<td>
+								{% if group.students[0].career %}
+									<a class="btn btn-warning" href="{{ url_for('recreate_careers', id=group.id) }}"><i class="fas fa-plus"></i> Re-generate Recommendations</a>
+									<a class="btn btn-info" href="{{ url_for('view_careers', id=group.id) }}"><i class="fas fa-eye"></i> View Reccomendations</a>
+								<a class="btn btn-info" href="{{ url_for('create_alumni', id=group.id) }}"><i class="fas fa-user-graduate"></i> Graduate Group</a>
+								{% else %}
+									<a class="btn btn-warning" href="{{ url_for('create_careers', id=group.id) }}"><i class="fas fa-plus"></i> Generate Recommendations</a>
+								{% endif %}
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="card my-3">
+			<div class="card-header">
+				<h3 class="card-title">Graduated Groups</h3>
+			</div>
+			<div class="card-body table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Class</th><th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for group in alumni %}
+						<tr>
+							<td>{% print(group.year) %}</td>
+							<td>
+								{% if group.students[0].career %}
+									<a class="btn btn-warning" href="{{ url_for('recreate_careers', id=group.id) }}"><i class="fas fa-plus"></i> Re-generate Recommendations</a>
+								{% else %}
+									<a class="btn btn-warning" href="{{ url_for('create_careers', id=group.id) }}"><i class="fas fa-plus"></i> Generate Recommendations</a>
+								{% endif %}
+								<a class="btn btn-info" href="{{ url_for('view_careers', id=group.id) }}"><i class="fas fa-eye"></i> View Reccomendations</a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% elif action=='view' %}
+
+<div class="row">
+	<div class="col p-3">
+		<a class="btn float-right btn-outline-info" href="{{ url_for('careers') }}"><i class="fas fa-list"></i> VIEW ALL GROUPS</a>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<div class="row">
+					<div class="col">
+						<h3 class="card-title text-info">Class: {% print(group.year) %}</h3>
+					</div>
+					<div class="col">
+						<a class="btn btn-warning" href="{{ url_for('recreate_careers', id=group.id) }}"><i class="fas fa-plus"></i> Re-generate Recommendations</a>
+						<a class="btn btn-info" href="{{ url_for('create_alumni', id=group.id) }}"><i class="fas fa-user-graduate"></i> Graduate Group</a>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row my-3">
+	<div class="col">
+		<div class="card">
+			<div class="card-body table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							{% for subject in subjects %}
+								{% for category in subject.categories %}
+								<th>{% print(subject.name) %} {% print(category.name) %}</th>
+								{% endfor %}
+							{% endfor %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for student in group.students %}
+						<tr>
+							{% for subject in subjects %}
+								{% for category in subject.categories %}
+								<td>
+									{% for item in student.analytics %}
+										{% if item.category_id == category.id %}
+											{% print(item.value*100) %}%
+										{% endif %}
+									{% endfor %}
+								</td>
+								{% endfor %}
+							{% endfor %}
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
 
 {% endif %}
 {% endblock %}
