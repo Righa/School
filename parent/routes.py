@@ -8,7 +8,6 @@ from parent.models import *
 @app.route('/')
 @app.route('/home')
 def home():
-	#abort(403)
 	return render_template('index.html', nav='landing')
 
 ## auth
@@ -78,13 +77,6 @@ def update_user(id):
 		form.middle_name.data = user.middle_name
 		form.last_name.data = user.last_name
 	return render_template('admin/users.html', nav='dash', page='users', action='update', form=form)
-
-## users view
-
-@app.route('/users/view/<id>', methods=['POST', 'GET'])
-def view_user(id):
-	user = User.query.get_or_404(id)
-	return render_template('admin/users.html', nav='dash', page='users', action='view', user=user)
 
 ## users delete
 
@@ -239,7 +231,7 @@ def create_category(id):
 		db.session.add(category)
 		db.session.commit()
 		flash('Category added successfully', 'success')
-		return redirect(url_for('create_category'))
+		return redirect(url_for('view_subject', id=id))
 	return render_template('admin/categories.html', nav='dash', page='subjects', action='create', form=form)
 
 ## categories update
@@ -247,7 +239,8 @@ def create_category(id):
 @app.route('/categories/update/<id>', methods=['POST', 'GET'])
 def update_category(id):
 	category = Category.query.get_or_404(id)
-	form = QuestionForm()
+	form = CategoryForm()
+
 	if form.validate_on_submit():
 		category.name=form.name.data
 		category.minimum=form.minimum.data
@@ -340,7 +333,7 @@ def create_question(id):
 		db.session.add(question)
 		db.session.commit()
 		flash('Question added successfully', 'success')
-		return redirect(url_for('create_question', id=id))
+		return redirect(url_for('view_exam', id=id))
 	return render_template('admin/questions.html', nav='dash', page='exams', action='create', form=form)
 
 ## questions update
@@ -372,7 +365,7 @@ def delete_question(id):
 ## scores create
 
 @app.route('/scores/create/<id>', methods=['POST', 'GET'])
-def create_scores(id):
+def create_score(id):
 	exam= Exam.query.get_or_404(id)
 	form = ScoreForm()
 			
@@ -394,23 +387,42 @@ def create_scores(id):
 
 ## careers create
 
-@app.route('/careers/create', methods=['POST', 'GET'])
-def create_career():
+@app.route('/careers/create/<id>', methods=['POST', 'GET'])
+def create_careers():
+	group = Group.query.get_or_404(id)
+
 	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
 
 ## careers read
 
 @app.route('/careers', methods=['POST', 'GET'])
 def careers():
-	groups = Group.query.all()
-	return render_template('admin/careers.html', nav='dash', page='careers', action='read', groups=groups)
+	groups = Group.query.filter_by(status='ongoing')
+	alumni = Group.query.filter_by(status='alumni')
+	return render_template('admin/careers.html', nav='dash', page='careers', action='read', groups=groups, alumni=alumni)
 
 ## careers view
 
 @app.route('/careers/view/<id>', methods=['POST', 'GET'])
-def view_career(id):
+def view_careers(id):
+	group = Group.query.get_or_404(id)
+	return render_template('admin/careers.html', nav='dash', page='careers', action='view', group=group)
+
+## careers recreate
+
+@app.route('/careers/recreate/<id>', methods=['POST', 'GET'])
+def recreate_careers(id):
+	group = Group.query.get_or_404(id)
+
+	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
+
+## careers update
+
+@app.route('/careers/update/<id>', methods=['POST', 'GET'])
+def create_career(id):
 	career = Career.query.get_or_404(id)
-	return render_template('admin/careers.html', nav='dash', page='careers', action='view', career=career)
+
+	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
 
 ## careers delete
 
@@ -421,6 +433,16 @@ def delete_career(id):
 	db.session.commit()
 	flash(f'Career has been deleted!', 'success')
 	return redirect(url_for('careers'))
+
+## alumni create
+
+@app.route('/alumni/create/<id>', methods=['POST', 'GET'])
+def create_alumni(id):
+	group = Group.query.get_or_404(id)
+	group.status = 'alumni'
+	db.session.commit()
+	flash(f'Group has been passed out!', 'success')
+	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
 
 ## alumni read
 

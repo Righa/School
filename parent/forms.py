@@ -6,7 +6,7 @@ from parent.models import *
 
 
 def group_query():
-	return Group.query
+	return Group.query.filter_by(status='ongoing')
 
 def subject_query():
 	return Subject.query
@@ -22,7 +22,7 @@ class EditUserForm(FlaskForm):
 	submit = SubmitField('Save')
 
 class EditStudentForm(EditUserForm):
-	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='name')
+	group = QuerySelectField('Group', query_factory=group_query, allow_blank=False, get_label='year')
 
 class UserForm(EditUserForm):
 	email = StringField('Email', validators=[DataRequired(), Email()])
