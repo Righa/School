@@ -3,6 +3,7 @@ from parent import app, db, bcrypt
 from parent.forms import *
 from parent.models import *
 from statistics import mean
+from parent.ml import MLModel
 
 ##landing
 
@@ -248,6 +249,7 @@ def update_category(id):
 		category.maximum=form.maximum.data
 		db.session.commit()
 		flash('Category updated successfully', 'success')
+		return redirect(url_for('view_subject', id=category.subject_id))
 	elif request.method == 'GET':
 		form.name.data=category.name
 		form.minimum.data=category.minimum
@@ -393,6 +395,7 @@ def create_careers(id):
 	group = Group.query.get_or_404(id)
 
 	for student in group.students:
+		allscores=[]
 		for subject in Subject.query.all():
 			for category in subject.categories:
 				scores=[]
@@ -402,10 +405,23 @@ def create_careers(id):
 
 				if len(scores)>0:
 					value=mean(scores)/category.maximum
+					allscores.append(value)
 					analytics = Analytics(student_id=student.id, category_id=category.id, value=value)
 					db.session.add(analytics)
-					db.session.commit()
-	flash('Data scraping complete', 'success')
+				else:
+					flash(category.subject.name + category.name + ' missing', 'danger')
+					return redirect(url_for('view_careers', id=id))
+
+		#ML application
+		if len(allscores) == 23:
+			predictions = MLModel.generateSingle(allscores)
+			career = Career(student_id=student.id, profession1=predictions[0], profession2=predictions[1], profession3=predictions[2])
+			db.session.add(career)
+		else:
+			flash('Failed! Some strands are missing', 'danger')
+			return redirect(url_for('view_careers', id=id))
+
+		db.session.commit()
 	return redirect(url_for('view_careers', id=id))
 
 ## careers read
@@ -458,7 +474,7 @@ def create_alumni(id):
 	group.status = 'alumni'
 	db.session.commit()
 	flash(f'Group has been passed out!', 'success')
-	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
+	return redirect('careers')
 
 ## alumni read
 

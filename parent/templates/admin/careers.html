@@ -102,7 +102,6 @@
 					</div>
 					<div class="col">
 						<a class="btn btn-warning" href="{{ url_for('recreate_careers', id=group.id) }}"><i class="fas fa-plus"></i> Re-generate Recommendations</a>
-						<a class="btn btn-info" href="{{ url_for('create_alumni', id=group.id) }}"><i class="fas fa-user-graduate"></i> Graduate Group</a>
 					</div>
 				</div>
 				
@@ -118,16 +117,21 @@
 				<table class="table table-hover">
 					<thead>
 						<tr>
+							<th>Student</th>
 							{% for subject in subjects %}
 								{% for category in subject.categories %}
 								<th>{% print(subject.name) %} {% print(category.name) %}</th>
 								{% endfor %}
 							{% endfor %}
+							<th>Option I</th>
+							<th>Option II</th>
+							<th>Option III</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for student in group.students %}
 						<tr>
+							<td>{% print(student.first_name) %} {% print(student.last_name) %}</td>
 							{% for subject in subjects %}
 								{% for category in subject.categories %}
 								<td>
@@ -139,6 +143,9 @@
 								</td>
 								{% endfor %}
 							{% endfor %}
+							<td>{% print(student.career.profession1) %}</td>
+							<td>{% print(student.career.profession2) %}</td>
+							<td>{% print(student.career.profession3) %}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
