@@ -2,6 +2,7 @@ from flask import redirect, request, url_for, render_template, flash
 from parent import app, db, bcrypt
 from parent.forms import *
 from parent.models import *
+from statistics import mean
 
 ##landing
 
@@ -382,16 +383,30 @@ def create_score(id):
 				db.session.add(score)
 				db.session.commit()
 		flash('Scores have been captured successfully', 'success')
-		return redirect(url_for('create_scores', id=id))
+		return redirect(url_for('create_score', id=id))
 	return render_template('admin/scores.html', nav='dash', page='exams', action='create', exam=exam, form=form)
 
 ## careers create
 
 @app.route('/careers/create/<id>', methods=['POST', 'GET'])
-def create_careers():
+def create_careers(id):
 	group = Group.query.get_or_404(id)
 
-	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
+	for student in group.students:
+		for subject in Subject.query.all():
+			for category in subject.categories:
+				scores=[]
+				for question in category.questions:
+					for score in Score.query.filter_by(student_id=student.id, question_id=question.id):
+						scores.append(score.value)
+
+				if len(scores)>0:
+					value=mean(scores)/category.maximum
+					analytics = Analytics(student_id=student.id, category_id=category.id, value=value)
+					db.session.add(analytics)
+					db.session.commit()
+	flash('Data scraping complete', 'success')
+	return redirect(url_for('view_careers', id=id))
 
 ## careers read
 
@@ -406,7 +421,8 @@ def careers():
 @app.route('/careers/view/<id>', methods=['POST', 'GET'])
 def view_careers(id):
 	group = Group.query.get_or_404(id)
-	return render_template('admin/careers.html', nav='dash', page='careers', action='view', group=group)
+	subjects = Subject.query.all()
+	return render_template('admin/careers.html', nav='dash', page='careers', action='view', subjects=subjects, group=group)
 
 ## careers recreate
 

@@ -68,7 +68,7 @@ class GroupForm(FlaskForm):
 
 class CategoryForm(FlaskForm):
 	name = StringField('Name', validators=[DataRequired(), Length(min=3, max=19)])
-	minimum = IntegerField('Minimum Marks')
+	minimum = IntegerField('Minimum Marks', validators=[NumberRange(min=0, max=1)])
 	maximum = IntegerField('Maximum Marks', validators=[NumberRange(min=1, max=100)])
 	submit = SubmitField('Submit')
 
