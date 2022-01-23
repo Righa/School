@@ -2,5 +2,123 @@
 
 
 {% block pagedata %}
-analytics
+<div class="card my-3">
+	<div class="card-header text-info">
+		<h3 class="display-4"><i class="fas fa-tachometer-alt"></i> DASHBORD</h3>
+	</div>
+	<div class="card-body">
+		<div class="row text-center text-info">
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.students }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">STUDENTS</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.groups }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">GROUPS</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col h-100">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.subjects }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">SUBJECTS</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.exams }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">EXAMS</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.current }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">ONGOING GROUPS</h3>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.graduated }}</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">GRADUATED GROUPS</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card my-3">
+	<div class="card-body">
+		<div class="row">
+			<div class="col">
+				{% if metrics.outcomes < 100 %}
+				<div class="card text-warning">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.outcomes }}%</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">Outcomes Captured</h3>
+					</div>
+				</div>
+				{% else %}
+				<div class="card text-success">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.outcomes }}%</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">Outcomes Captured</h3>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+			<div class="col">
+				{% if metrics.untested > 0 %}
+				<div class="card text-warning">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.untested }}%</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">Untested Categories</h3>
+					</div>
+				</div>
+				{% else %}
+				<div class="card text-success">
+					<div class="card-body">
+						<h3 class="display-1">{{ metrics.untested }}%</h3>
+					</div>
+					<div class="card-footer">
+						<h3 class="card-title">Untested Categories</h3>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
+
 {% endblock %}
