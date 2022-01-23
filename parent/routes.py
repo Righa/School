@@ -4,6 +4,7 @@ from parent.forms import *
 from parent.models import *
 from statistics import mean
 from parent.ml import MLModel
+import json
 
 ##landing
 
@@ -34,8 +35,62 @@ def student_login():
 
 @app.route('/admin-dash', methods=['GET'])
 def admin_dash():
-	return render_template('admin/analytics.html', nav='dash', page='analytics')
 
+	#create object
+	class metrics():
+		clean=True
+
+	metrics.groups = Group.query.count()
+	metrics.students = Student.query.count()
+	metrics.subjects = Subject.query.count()
+	metrics.exams = Exam.query.count()
+	metrics.current = Group.query.filter_by(status='ongoing').count()
+	metrics.graduated = Group.query.filter_by(status='ongoing').count()
+
+	outcomes_total=0
+	outcomes_captured=0
+
+	groups = Group.query.all()
+	for group in groups:
+		group_size=len(group.students)
+
+		for exam in group.exams:
+			outcomes_total += len(exam.questions)*group_size
+
+			for question in exam.questions:
+				outcomes_captured += len(question.scores)
+
+	metrics.outcomes = (outcomes_captured/outcomes_total)*100
+
+	categories = Category.query.all()
+	tested=0
+
+	for group in groups:
+		for category in categories:
+			found=0
+			for exam in group.exams:
+				for question in exam.questions:
+					if question.category_id == category.id:
+						found += 1
+			if found > 0:
+				tested += 1
+	
+	metrics.untested = ((tested-len(categories))/len(categories))*100
+
+
+	return render_template('admin/analytics.html', nav='dash', page='analytics', metrics=metrics)
+
+
+@app.route('/get-chart', methods=['GET'])
+def get_chart():
+	groups = Group.query.all()
+
+	chart = []
+
+	for group in groups:
+		chart.append([group.year, len(group.students)])
+
+	return json.dumps(chart)
 
 @app.route('/student-dash', methods=['GET'])
 def student_dash():
@@ -130,13 +185,6 @@ def update_student(id):
 		form.last_name.data = student.last_name
 		form.group.data = student.group
 	return render_template('admin/students.html', nav='dash', page='students', action='update', form=form)
-
-## students view
-
-@app.route('/students/view/<id>', methods=['POST', 'GET'])
-def view_student(id):
-	student = Student.query.get_or_404(id)
-	return render_template('admin/students.html', nav='dash', page='students', action='view', student=student)
 
 ## students delete
 
@@ -409,8 +457,8 @@ def create_careers(id):
 					analytics = Analytics(student_id=student.id, category_id=category.id, value=value)
 					db.session.add(analytics)
 				else:
-					flash(category.subject.name + category.name + ' missing', 'danger')
-					return redirect(url_for('view_careers', id=id))
+					flash(category.subject.name + ' ' + category.name + ' is Missing', 'danger')
+					return redirect(url_for('careers'))
 
 		#ML application
 		if len(allscores) == 23:
@@ -419,7 +467,7 @@ def create_careers(id):
 			db.session.add(career)
 		else:
 			flash('Failed! Some strands are missing', 'danger')
-			return redirect(url_for('view_careers', id=id))
+			return redirect(url_for('careers'))
 
 		db.session.commit()
 	return redirect(url_for('view_careers', id=id))

@@ -28,4 +28,9 @@ function toggleForm(id) {
 	}
 	
 }
+function doAlert() {
+	alert('working')
+}
+
+ 
 //dashboard nav toggle
