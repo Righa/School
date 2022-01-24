@@ -17,3 +17,7 @@
   color: teal;
   background: white;
 }
+
+.table thead tr th {
+  vertical-align: top;
+}

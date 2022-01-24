@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{%block title%}Home Page{%endblock%}
+{%block title%}Student Portal{%endblock%}
 {%block content%}
 <div class="row border border-info">
 	<div class="col-2">
@@ -26,15 +26,15 @@
 					
 				</div>
 			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-chart-pie"></i> ANALYTICS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-book"></i> REPORTS</div>
-			</div>
-			<div class="row btn-outline-info p-3">
-				<div class="col"><i class="fas fa-user-graduate"></i> CAREERS</div>
-			</div>
+			<a id="analytics" class="row nav-link btn-outline-info p-3" href="{{ url_for('student_dash') }}">
+				<div class="col"><i class="fas fa-chart-pie"></i> ANALYTICS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="reports" class="row nav-link btn-outline-info p-3" href="{{ url_for('student_reports') }}">
+				<div class="col"><i class="fas fa-book"></i> REPORTS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
+			<a id="careers" class="row nav-link btn-outline-info p-3" href="{{ url_for('student_careers') }}">
+				<div class="col"><i class="fas fa-user-graduate"></i> CAREERS <i class="fas fa-chevron-right float-right"></i></div>
+			</a>
 		</div>
 	</div>
 	<div class="col-10 border-left border-info">

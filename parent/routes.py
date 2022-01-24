@@ -40,18 +40,22 @@ def admin_dash():
 	class metrics():
 		clean=True
 
-	metrics.groups = Group.query.count()
-	metrics.students = Student.query.count()
-	metrics.subjects = Subject.query.count()
-	metrics.exams = Exam.query.count()
-	metrics.current = Group.query.filter_by(status='ongoing').count()
-	metrics.graduated = Group.query.filter_by(status='ongoing').count()
+	metrics.num_groups = Group.query.count()
+	metrics.num_subjects = Subject.query.count()
+	metrics.num_current = Group.query.filter_by(status='ongoing').count()
+	metrics.num_graduated = Group.query.filter_by(status='alumni').count()
 
-	outcomes_total=0
-	outcomes_captured=0
+	groups = Group.query.filter_by(status='ongoing')
+	metrics.groups = []
+	metrics.num_students = 0
 
-	groups = Group.query.all()
+	categories = Category.query.all()
+
 	for group in groups:
+		outcomes_total=0
+		outcomes_captured=0
+		tested=0
+
 		group_size=len(group.students)
 
 		for exam in group.exams:
@@ -60,12 +64,11 @@ def admin_dash():
 			for question in exam.questions:
 				outcomes_captured += len(question.scores)
 
-	metrics.outcomes = (outcomes_captured/outcomes_total)*100
+		if outcomes_total==0:
+			group.outcomes=0
+		else:
+			group.outcomes = int((outcomes_captured/outcomes_total)*100)
 
-	categories = Category.query.all()
-	tested=0
-
-	for group in groups:
 		for category in categories:
 			found=0
 			for exam in group.exams:
@@ -74,27 +77,14 @@ def admin_dash():
 						found += 1
 			if found > 0:
 				tested += 1
-	
-	metrics.untested = ((tested-len(categories))/len(categories))*100
 
+		group.untested = int(((len(categories)-tested)/len(categories))*100)
+
+		metrics.num_students += group_size
+
+		metrics.groups.append(group)
 
 	return render_template('admin/analytics.html', nav='dash', page='analytics', metrics=metrics)
-
-
-@app.route('/get-chart', methods=['GET'])
-def get_chart():
-	groups = Group.query.all()
-
-	chart = []
-
-	for group in groups:
-		chart.append([group.year, len(group.students)])
-
-	return json.dumps(chart)
-
-@app.route('/student-dash', methods=['GET'])
-def student_dash():
-	return render_template('student/analytics.html', nav='dash', page='analytics')
 
 ## users create
 
@@ -532,6 +522,28 @@ def alumni():
 	return render_template('admin/alumni.html', nav='dash', page='alumni', action='read', groups=groups)
 
 
+
+
+## student analytics
+
+@app.route('/student-dash', methods=['GET'])
+def student_dash():
+	student=Student.query.get_or_404(1)
+	return render_template('student/analytics.html', nav='dash', page='analytics', student=student)
+
+## student reports
+
+@app.route('/reports', methods=['GET'])
+def student_reports():
+	student=Student.query.get_or_404(1)
+	return render_template('student/reports.html', nav='dash', page='reports', student=student)
+
+## student careers
+
+@app.route('/career', methods=['GET'])
+def student_careers():
+	student=Student.query.get_or_404(1)
+	return render_template('student/careers.html', nav='dash', page='careers', student=student)
 
 
 
