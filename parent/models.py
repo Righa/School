@@ -1,19 +1,27 @@
 from datetime import datetime
-from parent import db
+from parent import db, login_manager
+from flask_login import UserMixin
 
-class User(db.Model):
+@login_manager.user_loader
+def load_user(user_id):
+	return User.query.get(int(user_id))
+
+class User(db.Model, UserMixin):
 	id = db.Column(db.Integer, primary_key=True)
 	first_name = db.Column(db.String(19), nullable=False)
 	middle_name = db.Column(db.String(19), nullable=False)
 	last_name = db.Column(db.String(19), nullable=False)
 	email = db.Column(db.String(19), unique=True, nullable=False)
 	exams = db.relationship('Exam', backref='teacher', lazy=True, cascade='all, delete')
+	photo = db.Column(db.String(111), nullable=False, default='default-profile.jpg')
+	utype = db.Column(db.String(11), nullable=False, default='admin')
+	student = db.relationship('Student', backref='user', uselist=False, lazy=True, cascade='all, delete')
 	password = db.Column(db.String(119), nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
 	def __repr__(self):
-		return f"User('{self.id}', '{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
+		return f"User('{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
 
 class Group(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +33,7 @@ class Group(db.Model):
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
 
 	def __repr__(self):
-		return f"Group('{self.name}')"
+		return f"Group('{self.year}')"
 
 class Subject(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -40,22 +48,13 @@ class Subject(db.Model):
 
 class Student(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	first_name = db.Column(db.String(19), nullable=False)
-	middle_name = db.Column(db.String(19), nullable=False)
-	last_name = db.Column(db.String(19), nullable=False)
-	email = db.Column(db.String(19), unique=True, nullable=False)
 	scores = db.relationship('Score', backref='student', lazy=True, cascade='all, delete')
 	analytics = db.relationship('Analytics', backref='student', lazy=True, cascade='all, delete')
 	career = db.relationship('Career', backref='student', uselist=False, lazy=True, cascade='all, delete')
+	user_id = db.Column(db.Float, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 	group_id = db.Column(db.Integer, db.ForeignKey('group.id', ondelete='CASCADE'), nullable=False)
-	password = db.Column(db.String(119), nullable=False)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-
-	
-
-	def __repr__(self):
-		return f"Student('{self.first_name}', '{self.middle_name}', '{self.last_name}', '{self.email}')"
 
 class Category(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -122,7 +121,4 @@ class Career(db.Model):
 	profession3 = db.Column(db.String(44), nullable=True)
 	created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-
-	def __repr__(self):
-		return f"Career('{self.english_writing}', '{self.english_reading}', '{self.english_language}', '{self.science_state}', '{self.science_outline}', '{self.science_application}', '{self.science_attitude}', '{self.re_outline}', '{self.re_state}', '{self.re_application}', '{self.re_attitude}', '{self.agriculture_state}', '{self.agriculture_outline}', '{self.agriculture_application}', '{self.agriculture_attitude}', '{self.ss_state}', '{self.ss_outline}', '{self.ss_aplication}', '{self.ss_attitude}', '{self.math}', '{self.home_science}', '{self.creative_arts}', '{self.physical_and_health_education}', '{self.profession1}', '{self.profession2}', '{self.profession3}')"
-
+	

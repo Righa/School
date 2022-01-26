@@ -37,7 +37,7 @@
 
 								<input type="hidden" name="student_id" value="{% print(student.id) %}">
 
-								<td class="px-3">{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</td>
+								<td class="px-3">{% print(student.user.first_name) %} {% print(student.user.middle_name) %} {% print(student.user.last_name) %}</td>
 								<td class="px-3">
 									<div class="custom-control custom-checkbox my-1 mr-sm-2">
 									    <input type="checkbox" class="custom-control-input" id="{% print(student.id) %}-check" onchange="toggleForm('{% print(student.id) %}')">

@@ -1,0 +1,42 @@
+{% extends 'student-dash.html' %}
+
+
+{% block pagedata %}
+
+<div class="row my-5">
+	<div class="col">
+		<div class="card">
+			<div class="card-header"><h3 class="card-title text-info">My Performance Records</h3></div>
+			<div class="card-body">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Exam</th>
+							<th colspan="33">Marks (<span class="text-info">Question Number:</span> Score)</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for exam in current_user.student.group.exams %}
+
+						<tr>
+							<td class="text-info">{{ exam.subject.name }}</td>
+							{% for question in exam.questions %}
+							<td>
+								{% for score in current_user.student.scores %}
+									{% if score.question_id == question.id %}
+										<strong class="text-info">{{ question.number}}:</strong> {{ score.value }}
+									{% endif %}
+								{% endfor %}
+							</td>
+							{% endfor %}
+							<td colspan="33"></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</div>
+{% endblock %}

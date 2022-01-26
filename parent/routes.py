@@ -1,10 +1,14 @@
-from flask import redirect, request, url_for, render_template, flash
+from flask import redirect, request, url_for, render_template, flash, abort, session
 from parent import app, db, bcrypt
 from parent.forms import *
 from parent.models import *
 from statistics import mean
 from parent.ml import MLModel
+from flask_login import login_user, current_user, logout_user, login_required
+from PIL import Image
+import secrets
 import json
+import os
 
 ##landing
 
@@ -13,45 +17,112 @@ import json
 def home():
 	return render_template('index.html', nav='landing')
 
+@app.route('/events')
+def events():
+	return render_template('events.html', nav='landing')
+
+@app.route('/blogs')
+def blogs():
+	return render_template('blogs.html', nav='landing')
+	
+@app.route('/contacts')
+def contacts():
+	return render_template('contacts.html', nav='landing')
+
 ## auth
 
 @app.route('/admin-login', methods=['POST','GET'])
 def admin_login():
+	next_page=request.args.get('next')
+	if current_user.is_authenticated and current_user.utype=='admin':
+		return redirect(url_for('admin_dash'))
+	if next_page=='/student-dash' or next_page=='/reports' or next_page=='/career':
+		return redirect(url_for('student_login', next=next_page))
 	form = LoginForm()
 	if form.validate_on_submit():
-		flash(f'Login successful!', 'success')
-		return redirect(url_for('admin_dash'))
+		user = User.query.filter_by(email=form.email.data).first()
+		if user and bcrypt.check_password_hash(user.password, form.password.data) and user.utype=='admin':
+			login_user(user, remember=form.remember.data)
+			if bcrypt.check_password_hash(user.password, 'welcome'):
+				flash(f'Login successful!', 'success')
+				flash(f'You are advised to change to your prefered secure password on first login', 'info')
+				return redirect(url_for('change_password'))
+			flash(f'Login successful!', 'success')
+			return redirect(next_page) if next_page else redirect(url_for('admin_dash'))
+		else:
+			flash(f'Unable to login! Please check your credentials', 'danger')
 	return render_template('auth/login.html', type='Admin Login', nav='nonav', form=form)
 
 @app.route('/student-login', methods=['POST','GET'])
 def student_login():
+	next_page=request.args.get('next')
+	if current_user.is_authenticated and current_user.utype=='student':
+		return redirect(url_for('student_dash'))
 	form = LoginForm()
 	if form.validate_on_submit():
-		flash(f'Login successful!', 'success')
-		return redirect(url_for('student_dash'))
+		user = User.query.filter_by(email=form.email.data).first()
+		if user and bcrypt.check_password_hash(user.password, form.password.data) and user.utype=='student':
+			login_user(user, remember=form.remember.data)
+			if bcrypt.check_password_hash(user.password, 'welcome'):
+				flash(f'Login successful!', 'success')
+				flash(f'You are advised to change to your prefered secure password on first login', 'info')
+				return redirect(url_for('change_password'))
+			flash(f'Login successful!', 'success')
+			return redirect(next_page) if next_page else redirect(url_for('student_dash'))
+		else:
+			flash(f'Unable to login! Please check your credentials', 'danger')
 	return render_template('auth/login.html', type='Student Login', nav='nonav', form=form)
 
+
+@app.route('/change-password', methods=['POST','GET'])
+@login_required
+def change_password():
+	form = ChangePasswordForm()
+	if form.validate_on_submit():
+		if bcrypt.check_password_hash(current_user.password, form.password.data):
+			hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+			current_user.password = hashed_password
+			db.session.commit()
+
+			flash(f'Password changed successfully!', 'success')
+
+			if current_user.utype == 'admin':
+				return redirect(url_for('admin_dash'))
+			elif current_user.utype == 'student':
+				return redirect(url_for('student_dash'))
+			else:
+				return redirect(url_for('home'))
+		else:
+			flash(f'Your password is wrong!', 'danger')
+	return render_template('auth/reset_password.html', type='Change Password', nav='nonav', form=form)
+
 ## analytics
-
 @app.route('/admin-dash', methods=['GET'])
+@login_required
 def admin_dash():
-
+	if current_user.utype != 'admin':
+		abort(403)
+		
 	#create object
 	class metrics():
 		clean=True
 
-	metrics.groups = Group.query.count()
-	metrics.students = Student.query.count()
-	metrics.subjects = Subject.query.count()
-	metrics.exams = Exam.query.count()
-	metrics.current = Group.query.filter_by(status='ongoing').count()
-	metrics.graduated = Group.query.filter_by(status='ongoing').count()
+	metrics.num_groups = Group.query.count()
+	metrics.num_subjects = Subject.query.count()
+	metrics.num_current = Group.query.filter_by(status='ongoing').count()
+	metrics.num_graduated = Group.query.filter_by(status='alumni').count()
 
-	outcomes_total=0
-	outcomes_captured=0
+	groups = Group.query.filter_by(status='ongoing')
+	metrics.groups = []
+	metrics.num_students = 0
 
-	groups = Group.query.all()
+	categories = Category.query.all()
+
 	for group in groups:
+		outcomes_total=0
+		outcomes_captured=0
+		tested=0
+
 		group_size=len(group.students)
 
 		for exam in group.exams:
@@ -60,12 +131,11 @@ def admin_dash():
 			for question in exam.questions:
 				outcomes_captured += len(question.scores)
 
-	metrics.outcomes = (outcomes_captured/outcomes_total)*100
+		if outcomes_total==0:
+			group.outcomes=0
+		else:
+			group.outcomes = int((outcomes_captured/outcomes_total)*100)
 
-	categories = Category.query.all()
-	tested=0
-
-	for group in groups:
 		for category in categories:
 			found=0
 			for exam in group.exams:
@@ -74,32 +144,22 @@ def admin_dash():
 						found += 1
 			if found > 0:
 				tested += 1
-	
-	metrics.untested = ((tested-len(categories))/len(categories))*100
 
+		group.untested = int(((len(categories)-tested)/len(categories))*100)
+
+		metrics.num_students += group_size
+
+		metrics.groups.append(group)
 
 	return render_template('admin/analytics.html', nav='dash', page='analytics', metrics=metrics)
-
-
-@app.route('/get-chart', methods=['GET'])
-def get_chart():
-	groups = Group.query.all()
-
-	chart = []
-
-	for group in groups:
-		chart.append([group.year, len(group.students)])
-
-	return json.dumps(chart)
-
-@app.route('/student-dash', methods=['GET'])
-def student_dash():
-	return render_template('student/analytics.html', nav='dash', page='analytics')
 
 ## users create
 
 @app.route('/users/create', methods=['POST', 'GET'])
+@login_required
 def create_user():
+	if current_user.utype != 'admin':
+		abort(403)
 	form = UserForm()
 	if form.validate_on_submit():
 		hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
@@ -113,14 +173,20 @@ def create_user():
 ## users read
 
 @app.route('/users', methods=['POST', 'GET'])
+@login_required
 def users():
-	users = User.query.all()
+	if current_user.utype != 'admin':
+		abort(403)
+	users = User.query.filter_by(utype='admin')
 	return render_template('admin/users.html', nav='dash', page='users', users=users, action='read')
 
 ## users update
 
 @app.route('/users/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_user(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	form = EditUserForm()
 	user = User.query.get_or_404(id)
 	if form.validate_on_submit():
@@ -128,17 +194,58 @@ def update_user(id):
 		user.middle_name = form.middle_name.data
 		user.last_name = form.last_name.data
 		db.session.commit()
-		flash(f'Profile update successful!', 'success')
+		flash(f'User updated successfully!', 'success')
 	elif request.method == 'GET':
 		form.first_name.data = user.first_name
 		form.middle_name.data = user.middle_name
 		form.last_name.data = user.last_name
 	return render_template('admin/users.html', nav='dash', page='users', action='update', form=form)
 
+## users update profile
+
+def save_pic(pic):
+	rand_hex = secrets.token_hex(8)
+	_, f_ext = os.path.splitext(pic.filename)
+	pic_fn = rand_hex + f_ext
+	pic_path = os.path.join(app.root_path, 'static/profiles', pic_fn)
+
+	output_size = (133, 133)
+	i = Image.open(pic)
+	i.thumbnail(output_size)
+
+	i.save(pic_path)
+	
+	return pic_fn
+
+@app.route('/users/profile/update', methods=['POST', 'GET'])
+@login_required
+def update_user_profile():
+	if current_user.utype != 'admin':
+		abort(403)
+	form = EditUserForm()
+	user = current_user
+	if form.validate_on_submit():
+		if form.photo.data:
+			user.photo = save_pic(form.photo.data)
+		user.first_name = form.first_name.data
+		user.middle_name = form.middle_name.data
+		user.last_name = form.last_name.data
+		db.session.commit()
+		flash(f'Profile update successful!', 'success')
+		return redirect(url_for('update_user_profile'))
+	elif request.method == 'GET':
+		form.first_name.data = user.first_name
+		form.middle_name.data = user.middle_name
+		form.last_name.data = user.last_name
+	return render_template('admin/users.html', nav='dash', action='profile', form=form)
+
 ## users delete
 
 @app.route('/users/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_user(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	user = User.query.get_or_404(id)
 	db.session.delete(user)
 	db.session.commit()
@@ -148,12 +255,16 @@ def delete_user(id):
 ## students create
 
 @app.route('/students/create', methods=['POST', 'GET'])
+@login_required
 def create_student():
+	if current_user.utype != 'admin':
+		abort(403)
 	form = StudentForm()
 	if form.validate_on_submit():
 		hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
-		student = Student(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, group_id=form.group.data.id, password=hashed_password)
-		db.session.add(student)
+		user = User(first_name=form.first_name.data, middle_name=form.middle_name.data, last_name=form.last_name.data, email=form.email.data, utype='student', password=hashed_password)
+		db.session.add(user)
+		user.student = Student(group_id=form.group.data.id)
 		db.session.commit()
 		flash(f'Registration successful!', 'success')
 		return redirect(url_for('create_student'))
@@ -162,16 +273,22 @@ def create_student():
 ## students read
 
 @app.route('/students', methods=['POST', 'GET'])
+@login_required
 def students():
+	if current_user.utype != 'admin':
+		abort(403)
 	groups = Group.query.filter_by(status='ongoing')
 	return render_template('admin/students.html', nav='dash', page='students', groups=groups, action='read')
 
 ## students update
 
 @app.route('/students/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_student(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	form = EditStudentForm()
-	student = Student.query.get_or_404(id)
+	student = User.query.get_or_404(id)
 	if form.validate_on_submit():
 		student.first_name = form.first_name.data
 		student.middle_name = form.middle_name.data
@@ -189,9 +306,12 @@ def update_student(id):
 ## students delete
 
 @app.route('/students/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_student(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	student = Student.query.get_or_404(id)
-	db.session.delete(student)
+	db.session.delete(student.user)
 	db.session.commit()
 	flash(f'Student has been deleted!', 'success')
 	return redirect(url_for('students'))
@@ -199,7 +319,10 @@ def delete_student(id):
 ## groups create
 
 @app.route('/groups/create', methods=['POST', 'GET'])
+@login_required
 def create_group():
+	if current_user.utype != 'admin':
+		abort(403)
 	form = GroupForm()
 	if form.validate_on_submit():
 		group = Group(year=form.year.data)
@@ -212,7 +335,10 @@ def create_group():
 ## groups delete
 
 @app.route('/groups/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_group(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	group = Group.query.get_or_404(id)
 	db.session.delete(group)
 	db.session.commit()
@@ -222,7 +348,10 @@ def delete_group(id):
 ## subjects create
 
 @app.route('/subjects/create', methods=['POST', 'GET'])
+@login_required
 def create_subject():
+	if current_user.utype != 'admin':
+		abort(403)
 	form = SubjectForm()
 	if form.validate_on_submit():
 		subject = Subject(name=form.name.data)
@@ -235,14 +364,20 @@ def create_subject():
 ## subjects read
 
 @app.route('/subjects', methods=['POST', 'GET'])
+@login_required
 def subjects():
+	if current_user.utype != 'admin':
+		abort(403)
 	subjects = Subject.query.all()
 	return render_template('admin/subjects.html', nav='dash', page='subjects', subjects=subjects, action='read')
 
 ## subjects update
 
 @app.route('/subjects/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_subject(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	form = SubjectForm()
 	subject = Subject.query.get_or_404(id)
 	if form.validate_on_submit():
@@ -256,14 +391,20 @@ def update_subject(id):
 ## subjects view
 
 @app.route('/subjects/view/<id>', methods=['POST', 'GET'])
+@login_required
 def view_subject(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	subject = Subject.query.get_or_404(id)
 	return render_template('admin/subjects.html', nav='dash', page='subjects', action='view', subject=subject)
 
 ## subjects delete
 
 @app.route('/subjects/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_subject(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	subject = Subject.query.get_or_404(id)
 	db.session.delete(subject)
 	db.session.commit()
@@ -273,7 +414,10 @@ def delete_subject(id):
 ## categories create
 
 @app.route('/categories/create/<id>', methods=['POST', 'GET'])
+@login_required
 def create_category(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	subject = Subject.query.get_or_404(id)
 	form = CategoryForm()
 	if form.validate_on_submit():
@@ -287,7 +431,10 @@ def create_category(id):
 ## categories update
 
 @app.route('/categories/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_category(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	category = Category.query.get_or_404(id)
 	form = CategoryForm()
 
@@ -307,7 +454,10 @@ def update_category(id):
 ## categories delete
 
 @app.route('/categories/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_category(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	category = Category.query.get_or_404(id)
 	db.session.delete(category)
 	db.session.commit()
@@ -317,7 +467,10 @@ def delete_category(id):
 ## exams create
 
 @app.route('/exams/create', methods=['POST', 'GET'])
+@login_required
 def create_exam():
+	if current_user.utype != 'admin':
+		abort(403)
 	form = ExamForm()
 	if form.validate_on_submit():
 		exam = Exam(year=form.year.data, term=form.term.data, user_id=1, subject_id=form.subject.data.id, group_id=form.group.data.id)
@@ -330,14 +483,20 @@ def create_exam():
 ## exams read
 
 @app.route('/exams', methods=['POST', 'GET'])
+@login_required
 def exams():
+	if current_user.utype != 'admin':
+		abort(403)
 	groups = Group.query.filter_by(status='ongoing')
 	return render_template('admin/exams.html', nav='dash', groups=groups, page='exams', action='read')
 
 ## exams update
 
 @app.route('/exams/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_exam(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	form = ExamForm()
 	exam = Exam.query.get_or_404(id)
 	if form.validate_on_submit():
@@ -357,14 +516,20 @@ def update_exam(id):
 ## exams view
 
 @app.route('/exams/view/<id>', methods=['POST', 'GET'])
+@login_required
 def view_exam(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	exam = Exam.query.get_or_404(id)
 	return render_template('admin/exams.html', nav='dash', page='exams', action='view', exam=exam)
 
 ## exams delete
 
 @app.route('/exams/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_exam(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	exam = Exam.query.get_or_404(id)
 	db.session.delete(exam)
 	db.session.commit()
@@ -374,7 +539,10 @@ def delete_exam(id):
 ## questions create
 
 @app.route('/questions/create/<id>', methods=['POST', 'GET'])
+@login_required
 def create_question(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	form = QuestionForm()
 	exam= Exam.query.get(id)
 	subject_id = exam.subject_id
@@ -390,7 +558,10 @@ def create_question(id):
 ## questions update
 
 @app.route('/questions/update/<id>', methods=['POST', 'GET'])
+@login_required
 def update_question(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	question = Question.query.get_or_404(id)
 	form = QuestionForm()
 	if form.validate_on_submit():
@@ -405,7 +576,10 @@ def update_question(id):
 ## questions delete
 
 @app.route('/questions/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_question(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	question = Question.query.get_or_404(id)
 	exam_id = question.exam_id
 	db.session.delete(question)
@@ -416,7 +590,10 @@ def delete_question(id):
 ## scores create
 
 @app.route('/scores/create/<id>', methods=['POST', 'GET'])
+@login_required
 def create_score(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	exam= Exam.query.get_or_404(id)
 	form = ScoreForm()
 			
@@ -439,7 +616,10 @@ def create_score(id):
 ## careers create
 
 @app.route('/careers/create/<id>', methods=['POST', 'GET'])
+@login_required
 def create_careers(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	group = Group.query.get_or_404(id)
 
 	for student in group.students:
@@ -475,7 +655,10 @@ def create_careers(id):
 ## careers read
 
 @app.route('/careers', methods=['POST', 'GET'])
+@login_required
 def careers():
+	if current_user.utype != 'admin':
+		abort(403)
 	groups = Group.query.filter_by(status='ongoing')
 	alumni = Group.query.filter_by(status='alumni')
 	return render_template('admin/careers.html', nav='dash', page='careers', action='read', groups=groups, alumni=alumni)
@@ -483,7 +666,10 @@ def careers():
 ## careers view
 
 @app.route('/careers/view/<id>', methods=['POST', 'GET'])
+@login_required
 def view_careers(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	group = Group.query.get_or_404(id)
 	subjects = Subject.query.all()
 	return render_template('admin/careers.html', nav='dash', page='careers', action='view', subjects=subjects, group=group)
@@ -491,7 +677,10 @@ def view_careers(id):
 ## careers recreate
 
 @app.route('/careers/recreate/<id>', methods=['POST', 'GET'])
+@login_required
 def recreate_careers(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	group = Group.query.get_or_404(id)
 
 	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
@@ -499,7 +688,10 @@ def recreate_careers(id):
 ## careers update
 
 @app.route('/careers/update/<id>', methods=['POST', 'GET'])
+@login_required
 def create_career(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	career = Career.query.get_or_404(id)
 
 	return render_template('admin/careers.html', nav='dash', page='careers', action='create')
@@ -507,7 +699,10 @@ def create_career(id):
 ## careers delete
 
 @app.route('/careers/delete/<id>', methods=['POST', 'GET'])
+@login_required
 def delete_career(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	career = Career.query.get_or_404(id)
 	db.session.delete(career)
 	db.session.commit()
@@ -517,63 +712,124 @@ def delete_career(id):
 ## alumni create
 
 @app.route('/alumni/create/<id>', methods=['POST', 'GET'])
+@login_required
 def create_alumni(id):
+	if current_user.utype != 'admin':
+		abort(403)
 	group = Group.query.get_or_404(id)
 	group.status = 'alumni'
 	db.session.commit()
 	flash(f'Group has been passed out!', 'success')
-	return redirect('careers')
+	return redirect(url_for('careers'))
 
 ## alumni read
 
 @app.route('/alumni', methods=['POST', 'GET'])
+@login_required
 def alumni():
+	if current_user.utype != 'admin':
+		abort(403)
 	groups = Group.query.filter_by(status='alumni')
 	return render_template('admin/alumni.html', nav='dash', page='alumni', action='read', groups=groups)
 
 
 
 
+## student analytics
+
+@app.route('/student-dash', methods=['GET'])
+@login_required
+def student_dash():
+	if current_user.utype != 'student':
+		abort(403)
+		
+	#create object
+	class metrics():
+		clean=True
+	categories = Category.query.all()
+
+	group = current_user.student.group
+
+	outcomes_total=0
+	outcomes_captured=0
+	tested=0
+
+	group_size=len(group.students)
+
+	for exam in group.exams:
+		outcomes_total += len(exam.questions)*group_size
+
+		for question in exam.questions:
+			outcomes_captured += len(question.scores)
+
+	if outcomes_total==0:
+		group.outcomes=0
+	else:
+		group.outcomes = int((outcomes_captured/outcomes_total)*100)
+
+	for category in categories:
+		found=0
+		for exam in group.exams:
+			for question in exam.questions:
+				if question.category_id == category.id:
+					found += 1
+		if found > 0:
+			tested += 1
+
+	group.untested = int(((len(categories)-tested)/len(categories))*100)
+
+	metrics.outcomes = group.outcomes
+	metrics.untested = group.untested
 
 
+	return render_template('student/analytics.html', nav='dash', page='analytics', metrics=metrics)
+
+## student reports
+
+@app.route('/reports', methods=['GET'])
+@login_required
+def student_reports():
+	if current_user.utype != 'student':
+		abort(403)
+	return render_template('student/reports.html', nav='dash', page='reports')
+
+## student careers
+
+@app.route('/career', methods=['GET'])
+@login_required
+def student_careers():
+	if current_user.utype != 'student':
+		abort(403)
+	return render_template('student/careers.html', nav='dash', page='careers')
 
 
+@app.route('/student/profile/update', methods=['POST', 'GET'])
+@login_required
+def update_student_profile():
+	if current_user.utype != 'student':
+		abort(403)
+	form = EditUserForm()
+	if form.validate_on_submit():
+		if form.photo.data:
+			current_user.photo = save_pic(form.photo.data)
+		current_user.first_name = form.first_name.data
+		current_user.middle_name = form.middle_name.data
+		current_user.last_name = form.last_name.data
+		db.session.commit()
+		flash(f'Profile update successful!', 'success')
+		return redirect(url_for('update_student_profile'))
+	elif request.method == 'GET':
+		form.first_name.data = current_user.first_name
+		form.middle_name.data = current_user.middle_name
+		form.last_name.data = current_user.last_name
+	return render_template('student/profile.html', nav='dash', form=form)
 
+@app.route('/logout')
+@login_required
+def logout():
+	logout_user()
+	return redirect(url_for('home'))
 
-
-## dev links
-
-@app.route('/refreshdb', methods=['POST', 'GET'])
-def rfdb():
-	db.drop_all()
-	db.create_all()
-
-	hashed_password = bcrypt.generate_password_hash('welcome').decode('utf-8')
-	user = User(first_name='John', middle_name='Sam', last_name='Doe', email='johndoe@mail.com', password=hashed_password)
-	db.session.add(user)
-	group = Group(year=1999)
-	db.session.add(group)
-	subject = Subject(name='English')
-	db.session.add(subject)
-	db.session.commit()
-
-	category = Category(name='Writing', minimum=0, maximum=40, subject_id=1)
-	db.session.add(category)
-	student = Student(first_name='Jane', middle_name='Sam', last_name='Doe', group_id=1, email='janedoe@mail.com', password=hashed_password)
-	db.session.add(student)
-	exam = Exam(year=1999, term=1, user_id=1, subject_id=1, group_id=1)
-	db.session.add(exam)
-	db.session.commit()
-	
-	question = Question(number=1, category_id=1, exam_id=1)
-	db.session.add(question)
-	db.session.commit()
-	
-	score = Score(value=30, question_id=1, student_id=1)
-	db.session.add(score)
-	db.session.commit()
-	flash(f'Database has been cleared and re-seeded!', 'success')
-	return redirect(url_for('admin_dash'))
 
 
 
