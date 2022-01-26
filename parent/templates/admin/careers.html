@@ -135,7 +135,7 @@
 					<tbody>
 						{% for student in group.students %}
 						<tr>
-							<td>{% print(student.first_name) %} {% print(student.last_name) %}</td>
+							<td>{% print(student.user.first_name) %} {% print(student.user.last_name) %}</td>
 							{% for subject in subjects %}
 								{% for category in subject.categories %}
 								<td>

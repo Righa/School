@@ -7,6 +7,12 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	<script src="{{ url_for('static', filename='main.js') }}"></script>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/4c9bf4cf75.js" crossorigin="anonymous"></script>
+	
 	<title>{%block title%}{%endblock%}</title>
 </head>
 <body onload="changeNav('{{page}}')">
@@ -21,7 +27,7 @@
 		  	<div class="mr-auto"></div>
 		  	<ul class="navbar-nav">
 		  		<li class="nav-item">
-		  			<a href="#" class="nav-link active">HOME</a>
+		  			<a href="{{ url_for('home') }}" class="nav-link active">HOME</a>
 		  		</li>
 			    <li class="nav-item dropdown">
 			        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PORTAL</a>
@@ -31,13 +37,13 @@
 			        </div>
 			    </li>
 		  		<li class="nav-item">
-		  			<a href="#" class="nav-link">EVENTS</a>
+		  			<a href="{{ url_for('events') }}" class="nav-link">EVENTS</a>
 		  		</li>
 		  		<li class="nav-item">
-		  			<a href="#" class="nav-link">BLOGS</a>
+		  			<a href="{{ url_for('blogs') }}" class="nav-link">BLOGS</a>
 		  		</li>
 		  		<li class="nav-item">
-		  			<a href="#" class="nav-link">CONTACTS</a>
+		  			<a href="{{ url_for('contacts') }}" class="nav-link">CONTACTS</a>
 		  		</li>
 		  	</ul>
 
@@ -66,19 +72,19 @@
 		<div class="col p-5">
 			<div class="row">
 				<div class="col p-5">
-					<h1 class="display-1">GOOD ACADEMY</h1>
+					<h1 class="display-1">KNEC LCBE</h1>
 				</div>
 				<div class="col p-5">
 					<h1>Image Credits</h1>
-					<a class="btn btn-outline-light my-1" href="">Carousel Image 1 <i class="fas fa-external-link-alt"></i></a>
-					<a class="btn btn-outline-light my-1" href="">Carousel Image 2 <i class="fas fa-external-link-alt"></i></a>
-					<a class="btn btn-outline-light my-1" href="">Carousel Image 3 <i class="fas fa-external-link-alt"></i></a>
-					<a class="btn btn-outline-light my-1" href="">Carousel Image 4 <i class="fas fa-external-link-alt"></i></a>
-					<a class="btn btn-outline-light my-1" href="">Carousel Image 5 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" target="_blank" href="https://learningportal.iiep.unesco.org/sites/default/files/2020-02/sub%20saharan%20africa%27s%20secondary%20education%20challenges.png">Carousel Image 1 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" target="_blank" href="https://www.farmtoschoolafrica.org/wp-content/uploads/2018/03/DSC_0471.jpg">Carousel Image 2 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" target="_blank" href="https://assets.mcc.gov/content/uploads/CDI-Wisci.jpg">Carousel Image 3 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" target="_blank" href="https://www.un.org/africarenewal/sites/www.un.org.africarenewal/files/styles/ar_paragraph_wide_photo/public/Classpic5.JPG?itok=icdLCxyk">Carousel Image 4 <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" target="_blank" href="https://static1.squarespace.com/static/5644bc92e4b0d1606755bcbe/t/5e1f74d0e0174509f72fa664/1579119826142/Logan+High.jpg">Carousel Image 5 <i class="fas fa-external-link-alt"></i></a>
 				</div>
 				<div class="col p-5">
 					<h1>Contacts</h1>
-					<a class="btn btn-outline-light my-1" href="{{ url_for('rfdb') }}"><i class="fas fa-envelope"></i> info@goodacademy.edu <i class="fas fa-external-link-alt"></i></a>
+					<a class="btn btn-outline-light my-1" href="mailto:info@goodacademy.edu"><i class="fas fa-envelope"></i> info@goodacademy.edu <i class="fas fa-external-link-alt"></i></a>
 					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
 					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
 					<p class="btn btn-outline-light"><i class="fas fa-phone-alt"></i> 678907865431</p>
@@ -93,10 +99,6 @@
 		</div>
 	</div>
 
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	<script src="https://kit.fontawesome.com/4c9bf4cf75.js" crossorigin="anonymous"></script>
 
 
 	

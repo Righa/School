@@ -3,5 +3,43 @@
 
 {% block pagedata %}
 
+<div class="row my-5">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title text-info">Career Recommendations</h3></div>
+			<div class="card-body">
+				{% if current_user.student.career %}
+					<h3 class="card-title text-info my-3">Career Option 1</h3>
+					<div class="card">
+						<div class="card-body">
+							{{ current_user.student.career.profession1 }}
+						</div>
+					</div>
 
+					<h3 class="card-title text-info my-3">Career Option 2</h3>
+					<div class="card">
+						<div class="card-body">
+							{{ current_user.student.career.profession2 }}
+						</div>
+					</div>
+
+					<h3 class="card-title text-info my-3">Career Option 3</h3>
+					<div class="card">
+						<div class="card-body">
+							{{ current_user.student.career.profession3 }}
+						</div>
+					</div>
+					
+				{% else %}
+
+					<div class="alert alert-info">
+						Your recommendations have not yet been generated. Please wait patiently or contact an administrator if this is a mistake
+					</div>
+
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FieldList, HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange, Optional
@@ -16,6 +17,7 @@ def category_query():
 
 
 class EditUserForm(FlaskForm):
+	photo = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'JPG', 'png', 'PNG'])])
 	first_name = StringField('First Name', validators=[DataRequired(), Length(min=3, max=19)])
 	middle_name = StringField('Middle Name', validators=[DataRequired(), Length(min=3, max=19)])
 	last_name = StringField('Last Name', validators=[DataRequired(), Length(min=3, max=19)])
@@ -30,10 +32,7 @@ class UserForm(EditUserForm):
 	def validate_email(self, email):
 
 		user = User.query.filter_by(email=email.data).first()
-		student = Student.query.filter_by(email=email.data).first()
 		if user:
-			raise ValidationError('Email has already been taken')
-		if student:
 			raise ValidationError('Email has already been taken')
 
 class StudentForm(UserForm):
@@ -42,7 +41,7 @@ class StudentForm(UserForm):
 class ChangePasswordForm(FlaskForm):
 	password = PasswordField('Current Password', validators=[DataRequired()])
 	new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=8, max=15)])
-	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo(new_password, message='Password should match confirmation'), Length(min=8, max=15)])
+	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('new_password', message='Password should match confirmation'), Length(min=8, max=15)])
 	submit = SubmitField('Change Password')
 
 class LoginForm(FlaskForm):

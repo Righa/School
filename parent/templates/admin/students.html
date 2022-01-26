@@ -127,8 +127,8 @@
 					<tbody>
 						{% for student in group.students %}
 						<tr>
-							<td>{% print(student.first_name) %} {% print(student.middle_name) %} {% print(student.last_name) %}</td>
-							<td>{% print(student.email) %}</td>
+							<td>{% print(student.user.first_name) %} {% print(student.user.middle_name) %} {% print(student.user.last_name) %}</td>
+							<td>{% print(student.user.email) %}</td>
 							<td>
 								<a href="{{ url_for('update_student', id=student.id) }}" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="top" title="EDIT"><i class="fas fa-user-edit"></i></a>
 								<a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="top" title="DELETE"><i class="fas fa-trash-alt"></i></a>
@@ -151,6 +151,7 @@
 	</div>
 </div>
 
+
 {% elif action=='update' %}
 
 <div class="row">
@@ -161,7 +162,7 @@
 </div>
 <div class="card p-3">
 	<div class="card-body text-primary">
-		<h1 class="card-title text-info">Edit Profile</h1>
+		<h1 class="card-title text-info">Modify Student Details</h1>
 	</div>
 	<form class="card" method="post">
 		{{ form.hidden_tag() }}
